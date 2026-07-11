@@ -22,7 +22,7 @@ export default function ExploreCard({ campaign }) {
     const colors = categoryColors[campaign.category] || { bg: "bg-gray-50", text: "text-gray-600" };
 
     return (
-        <Link href={`/campaigns/${campaign._id}`} className="group block bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100/50">
+        <Link href={`/explore/${campaign._id}`} className="group block bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100/50">
             {/* Image */}
             <div className="relative h-52 bg-gray-100 overflow-hidden">
                 {campaign.image ? (
