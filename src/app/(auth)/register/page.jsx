@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Poppins, Inter } from "next/font/google";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
-// import { authClient } from "@/lib/auth-client";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700"] });
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
