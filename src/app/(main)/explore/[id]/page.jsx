@@ -100,7 +100,10 @@ export default function CampaignDetailsPage() {
                 setContributeSuccess(true);
                 setContributionAmount("");
                 setProfile(prev => prev ? { ...prev, credits: prev.credits - amount } : prev);
-                setCampaign(prev => prev ? { ...prev, raisedAmount: (prev.raisedAmount || 0) + amount } : prev);
+                fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/campaigns/${params.id}`)
+                    .then(r => r.json())
+                    .then(data => { if (data) setCampaign(data); })
+                    .catch(() => {});
             }
         } catch {
             setContributeError("Network error. Please try again.");
