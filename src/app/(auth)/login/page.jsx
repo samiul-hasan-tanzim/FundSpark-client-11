@@ -59,8 +59,8 @@ const LoginPage = () => {
         if (error) {
             setApiError(error.message || error.statusText || "Login failed. Please try again.");
             setLoading(false);
-        } else if (data?.token) {
-            await initializeCredits(data.token);
+        } else if (data?.token && data?.user?.email) {
+            await initializeCredits(data.user.email);
             const role = data?.user?.role || "supporter";
             window.location.href = role === "creator" ? "/dashboard/creator" : "/dashboard/supporter";
         } else {

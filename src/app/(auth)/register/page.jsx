@@ -105,8 +105,8 @@ const SignUpPage = () => {
             });
             if (error) {
                 setApiError(error.message || error.statusText || "Registration failed. Please try again.");
-            } else if (data?.token) {
-                await initializeCredits(data.token);
+            } else if (data?.token && data?.user?.email) {
+                await initializeCredits(data.user.email);
                 window.location.href = role === "creator" ? "/dashboard/creator" : "/dashboard/supporter";
             }
         } else {
