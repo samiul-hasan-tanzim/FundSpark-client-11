@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { authClient, useSession } from "@/lib/auth-client";
+import NotificationDropdown from "@/components/NotificationDropdown";
 import { Inter, Poppins } from "next/font/google";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700"] });
@@ -82,6 +83,8 @@ const Navbar = () => {
                                     </svg>
                                     <span className={`text-xs font-bold text-[#4F46E5] ${inter.className}`}>{credits}</span>
                                 </div>
+
+                                <NotificationDropdown />
 
                                 <div className="relative group">
                                     <button className={`w-9 h-9 rounded-full overflow-hidden border-2 transition-all duration-200 ${scrolled ? "border-gray-200 hover:border-[#4F46E5] shadow-sm" : "border-white/40 hover:border-white"}`}>

@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { useSession } from "@/lib/auth-client";
+import NotificationDropdown from "@/components/NotificationDropdown";
 import { Inter, Poppins } from "next/font/google";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700"] });
@@ -64,14 +66,17 @@ export default function DashboardSidebar({ user, credits, role }) {
                             </span>
                         )}
                     </Link>
-                    <button onClick={() => setCollapsed(!collapsed)} className={`p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all ${collapsed ? "hidden" : ""}`}>
+                    <div className="flex items-center gap-1">
+                        <NotificationDropdown alignLeft={true} />
+                        <button onClick={() => setCollapsed(!collapsed)} className={`p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all ${collapsed ? "hidden" : ""}`}>
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
                         </svg>
                     </button>
                 </div>
+            </div>
 
-                {/* User info */}
+            {/* User info */}
                 <div className="px-4 py-4 border-b border-gray-100">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] flex items-center justify-center text-white text-sm font-bold shrink-0">
@@ -210,11 +215,14 @@ export default function DashboardSidebar({ user, credits, role }) {
                     </div>
                     <span className={`text-base font-bold bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] bg-clip-text text-transparent ${poppins.className}`}>FundSpark</span>
                 </Link>
-                <button onClick={() => setMobileOpen(true)} className="p-2 text-gray-600 hover:text-[#4F46E5] rounded-lg hover:bg-gray-100 transition-all">
+                <div className="flex items-center gap-1">
+                    <NotificationDropdown />
+                    <button onClick={() => setMobileOpen(true)} className="p-2 text-gray-600 hover:text-[#4F46E5] rounded-lg hover:bg-gray-100 transition-all">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
+                </div>
             </div>
         </>
     );
