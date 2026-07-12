@@ -3,6 +3,7 @@ import { useState, useRef } from "react";
 import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { Poppins, Inter } from "next/font/google";
+import Image from "next/image";
 import { categories } from "@/lib/homeData";
 import toast from "react-hot-toast";
 
@@ -15,8 +16,8 @@ export default function AddCampaign() {
     const [loading, setLoading] = useState(false);
     const [apiError, setApiError] = useState("");
     const [success, setSuccess] = useState(false);
-    const [imageFile, setImageFile] = useState(null);
-    const [imagePreview, setImagePreview] = useState(null);
+    const [imageFiles, setImageFiles] = useState([]);
+    const [imagePreviews, setImagePreviews] = useState([]);
     const fileInputRef = useRef(null);
 
     const uploadToImgBB = async (file) => {
@@ -50,14 +51,21 @@ export default function AddCampaign() {
             return;
         }
 
-        let image = "";
-        if (imageFile) {
-            image = await uploadToImgBB(imageFile);
-            if (!image) {
+        if (imageFiles.length === 0) {
+            setApiError("Please upload at least one image.");
+            setLoading(false);
+            return;
+        }
+
+        const images = [];
+        for (const file of imageFiles) {
+            const url = await uploadToImgBB(file);
+            if (!url) {
                 setApiError("Failed to upload image. Please try again.");
                 setLoading(false);
                 return;
             }
+            images.push(url);
         }
 
         const payload = {
@@ -68,7 +76,8 @@ export default function AddCampaign() {
             minimumContribution,
             deadline: new Date(deadline).toISOString(),
             rewardInfo,
-            image,
+            image: images[0],
+            images,
             creatorEmail: session?.user?.email,
             creatorName: session?.user?.name,
         };
@@ -98,13 +107,19 @@ export default function AddCampaign() {
     };
 
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setImageFile(file);
+        const files = Array.from(e.target.files || []);
+        setImageFiles(prev => [...prev, ...files]);
+        files.forEach(file => {
             const reader = new FileReader();
-            reader.onloadend = () => setImagePreview(reader.result);
+            reader.onloadend = () => setImagePreviews(prev => [...prev, reader.result]);
             reader.readAsDataURL(file);
-        }
+        });
+        e.target.value = "";
+    };
+
+    const removeImage = (index) => {
+        setImageFiles(prev => prev.filter((_, i) => i !== index));
+        setImagePreviews(prev => prev.filter((_, i) => i !== index));
     };
 
     if (success) {
@@ -192,26 +207,33 @@ export default function AddCampaign() {
                     <textarea id="rewardInfo" name="rewardInfo" rows={4} placeholder="Describe the rewards supporters will receive for their contributions" className={`${inputClass} resize-y min-h-[100px]`} disabled={loading} />
                 </div>
 
-                {/* Cover Image */}
+                {/* Campaign Images */}
                 <div>
-                    <label className={labelClass}>Cover Image</label>
-                    <div className="flex items-center gap-4">
+                    <label className={labelClass}>Campaign Images <span className="text-red-400">*</span></label>
+                    <div className="flex flex-wrap items-center gap-4">
                         <button type="button" onClick={() => fileInputRef.current?.click()} disabled={loading} className="cursor-pointer inline-flex items-center gap-2 px-5 py-3 rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 text-gray-600 hover:border-[#4F46E5] hover:text-[#4F46E5] transition-all duration-200">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                             <span className={`text-sm font-medium ${inter.className}`}>
-                                {imageFile ? "Change Image" : "Upload Image"}
+                                {imageFiles.length > 0 ? "Add More Images" : "Upload Images"}
                             </span>
                         </button>
-                        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} disabled={loading} />
-                        {imagePreview && (
-                            <div className="relative w-20 h-20 rounded-2xl overflow-hidden border-2 border-gray-200 shadow-sm">
-                                <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-                                <button type="button" onClick={() => { setImageFile(null); setImagePreview(null); }} className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs shadow hover:bg-red-600 transition-colors">✕</button>
-                            </div>
+                        <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleImageChange} disabled={loading} />
+                        {imagePreviews.length > 0 && (
+                            <span className={`text-xs text-gray-400 ${inter.className}`}>{imageFiles.length} image(s) selected</span>
                         )}
                     </div>
+                    {imagePreviews.length > 0 && (
+                        <div className="flex flex-wrap gap-3 mt-4">
+                            {imagePreviews.map((preview, i) => (
+                                <div key={i} className="relative w-24 h-24 rounded-2xl overflow-visible border-2 border-gray-200 shadow-sm group">
+                                    <Image src={preview} alt={`Preview ${i + 1}`} fill className="object-cover" unoptimized />
+                                    <button type="button" onClick={() => removeImage(i)} className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-sm shadow-md hover:bg-red-600 transition-colors">✕</button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Submit */}

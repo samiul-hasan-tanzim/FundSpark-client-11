@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "@/lib/auth-client";
 import { Poppins, Inter } from "next/font/google";
 import Link from "next/link";
+import Image from "next/image";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700"] });
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
@@ -75,9 +76,18 @@ export default function MyCampaigns() {
                                     return (
                                         <tr key={c._id} className="hover:bg-gray-50/50 transition-colors">
                                             <td className="px-6 py-4">
-                                                <Link href={`/explore/${c._id}`} className={`text-sm font-medium text-gray-900 hover:text-[#4F46E5] transition-colors ${inter.className}`}>
-                                                    {c.title}
-                                                </Link>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0">
+                                                        {c.image ? (
+                                                            <Image src={c.image} alt={c.title} width={40} height={40} className="w-full h-full object-cover" unoptimized />
+                                                        ) : (
+                                                            <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200" />
+                                                        )}
+                                                    </div>
+                                                    <Link href={`/explore/${c._id}`} className={`text-sm font-medium text-gray-900 hover:text-[#4F46E5] transition-colors ${inter.className}`}>
+                                                        {c.title}
+                                                    </Link>
+                                                </div>
                                             </td>
                                             <td className={`px-6 py-4 text-sm text-gray-600 ${inter.className}`}>{c.category || "General"}</td>
                                             <td className="px-6 py-4 text-right">

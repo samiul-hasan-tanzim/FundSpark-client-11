@@ -1,9 +1,11 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import ExploreFilters from "@/components/ExploreFilters";
 import ExploreCard, { ExploreCardSkeleton } from "@/components/ExploreCard";
+
+const PER_PAGE = 9;
 
 export default function ExplorePage() {
     const [campaigns, setCampaigns] = useState([]);
@@ -14,6 +16,7 @@ export default function ExplorePage() {
     const [statusFilter, setStatusFilter] = useState([]);
     const [goalMin, setGoalMin] = useState(0);
     const [goalMax, setGoalMax] = useState(100000000);
+    const [page, setPage] = useState(1);
 
     useEffect(() => {
         fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/campaigns`, { cache: 'no-store' })
@@ -71,6 +74,43 @@ export default function ExplorePage() {
         return result;
     }, [campaigns, search, category, sort, statusFilter, goalMin, goalMax]);
 
+    const totalPages = Math.ceil(filtered.length / PER_PAGE);
+    const paged = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+    const resetFilters = useCallback(() => {
+        setCategory("");
+        setSearch("");
+        setStatusFilter([]);
+        setGoalMin(0);
+        setGoalMax(100000000);
+        setPage(1);
+    }, []);
+
+    const goToPage = useCallback((p) => {
+        if (p >= 1 && p <= totalPages) setPage(p);
+    }, [totalPages]);
+
+    useEffect(() => { setPage(1); }, [search, category, sort, statusFilter, goalMin, goalMax]);
+
+    const getPageNumbers = () => {
+        const pages = [];
+        const maxVisible = 5;
+        if (totalPages <= maxVisible + 2) {
+            for (let i = 1; i <= totalPages; i++) pages.push(i);
+        } else {
+            pages.push(1);
+            let start = Math.max(2, page - 1);
+            let end = Math.min(totalPages - 1, page + 1);
+            if (page <= 3) { start = 2; end = Math.min(maxVisible, totalPages - 1); }
+            if (page >= totalPages - 2) { start = Math.max(2, totalPages - maxVisible + 1); end = totalPages - 1; }
+            if (start > 2) pages.push("...");
+            for (let i = start; i <= end; i++) pages.push(i);
+            if (end < totalPages - 1) pages.push("...");
+            pages.push(totalPages);
+        }
+        return pages;
+    };
+
     return (
         <div>
             {/* Hero Search Section */}
@@ -121,7 +161,7 @@ export default function ExplorePage() {
                         goalMax={goalMax}
                         onGoalMinChange={setGoalMin}
                         onGoalMaxChange={setGoalMax}
-                        onReset={() => { setCategory(""); setSearch(""); setStatusFilter([]); setGoalMin(0); setGoalMax(100000000); }}
+                        onReset={resetFilters}
                     />
 
                     {/* Campaign Grid */}
@@ -139,23 +179,26 @@ export default function ExplorePage() {
                         ) : (
                             <>
                                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                                    {filtered.map((c) => <ExploreCard key={c._id} campaign={c} />)}
+                                    {paged.map((c) => <ExploreCard key={c._id} campaign={c} />)}
                                 </div>
 
-                                {/* Pagination */}
-                                <div className="mt-16 flex justify-center items-center gap-2">
-                                    <button type="button" className="w-10 h-10 flex items-center justify-center rounded-full border border-slate-300 hover:bg-white transition-colors">
-                                        <ChevronLeft size={20} className="text-slate-500" />
-                                    </button>
-                                    <button type="button" className="w-10 h-10 flex items-center justify-center rounded-full bg-indigo-700 text-white font-semibold text-sm">1</button>
-                                    <button type="button" className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white transition-colors font-semibold text-sm text-slate-700">2</button>
-                                    <button type="button" className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white transition-colors font-semibold text-sm text-slate-700">3</button>
-                                    <span className="text-slate-400 px-2">...</span>
-                                    <button type="button" className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white transition-colors font-semibold text-sm text-slate-700">12</button>
-                                    <button type="button" className="w-10 h-10 flex items-center justify-center rounded-full border border-slate-300 hover:bg-white transition-colors">
-                                        <ChevronRight size={20} className="text-slate-500" />
-                                    </button>
-                                </div>
+                                {totalPages > 1 && (
+                                    <div className="mt-16 flex justify-center items-center gap-2">
+                                        <button type="button" onClick={() => goToPage(page - 1)} disabled={page === 1} className="w-10 h-10 flex items-center justify-center rounded-full border border-slate-300 hover:bg-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                                            <ChevronLeft size={20} className="text-slate-500" />
+                                        </button>
+                                        {getPageNumbers().map((p, i) =>
+                                            p === "..." ? (
+                                                <span key={`ellipsis-${i}`} className="text-slate-400 px-2 select-none">...</span>
+                                            ) : (
+                                                <button key={p} type="button" onClick={() => goToPage(p)} className={`w-10 h-10 flex items-center justify-center rounded-full font-semibold text-sm transition-colors ${p === page ? "bg-indigo-700 text-white" : "hover:bg-white text-slate-700"}`}>{p}</button>
+                                            )
+                                        )}
+                                        <button type="button" onClick={() => goToPage(page + 1)} disabled={page === totalPages} className="w-10 h-10 flex items-center justify-center rounded-full border border-slate-300 hover:bg-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                                            <ChevronRight size={20} className="text-slate-500" />
+                                        </button>
+                                    </div>
+                                )}
                             </>
                         )}
                     </div>
