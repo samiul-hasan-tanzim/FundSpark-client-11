@@ -1,65 +1,108 @@
 "use client";
 import Link from "next/link";
-import { Poppins, Inter } from "next/font/google";
-
-const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700", "800"] });
-const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
+import { ChevronLeft, ChevronRight, Timer, Leaf } from "lucide-react";
 
 export default function TopCampaigns({ campaigns }) {
+    const formatCurrency = (val) => {
+        if (!val) return "$0";
+        const n = Number(val);
+        if (n >= 1000000) return "$" + (n / 1000000).toFixed(1) + "M";
+        if (n >= 1000) return "$" + (n / 1000).toFixed(1) + "K";
+        return "$" + n.toLocaleString();
+    };
+
+    const formatNumber = (val) => {
+        if (!val) return "0";
+        const n = Number(val);
+        if (n >= 1000) return (n / 1000).toFixed(0) + "," + (n % 1000 > 0 ? Math.round(n % 1000) : "000");
+        return n.toLocaleString();
+    };
+
+    const raisedPercent = (campaign) => {
+        const goal = campaign.fundingGoal || campaign.goal || 0;
+        const raised = campaign.raised || campaign.raisedAmount || 0;
+        if (!goal || goal === 0) return 0;
+        return Math.min(Math.round((raised / goal) * 100), 999);
+    };
+
     return (
-        <section id="explore" className="py-20 bg-[#F8FAFC]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-12">
-                    <h2 className={`text-3xl md:text-4xl font-bold text-gray-900 ${poppins.className}`}>Top Funded Campaigns</h2>
-                    <p className={`mt-3 text-gray-500 max-w-lg mx-auto ${inter.className}`}>Discover the most successful campaigns on FundSpark</p>
+        <section className="py-20 bg-slate-50/50">
+            <div className="max-w-7xl mx-auto px-5">
+                <div className="flex justify-between items-center mb-16">
+                    <h2 className="text-4xl font-bold text-slate-900">Top Funded Campaigns</h2>
+                    <div className="flex gap-3">
+                        <button type="button" className="w-12 h-12 rounded-full border border-slate-300 flex items-center justify-center hover:bg-indigo-700 hover:text-white transition-all">
+                            <ChevronLeft size={20} />
+                        </button>
+                        <button type="button" className="w-12 h-12 rounded-full border border-slate-300 flex items-center justify-center hover:bg-indigo-700 hover:text-white transition-all">
+                            <ChevronRight size={20} />
+                        </button>
+                    </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {campaigns.length === 0 && Array.from({ length: 6 }).map((_, i) => (
-                        <div key={i} className="bg-white rounded-[24px] overflow-hidden shadow-sm animate-pulse">
-                            <div className="h-48 bg-gray-200" />
-                            <div className="p-5 space-y-3">
-                                <div className="h-4 bg-gray-200 rounded w-3/4" />
-                                <div className="h-3 bg-gray-200 rounded w-1/2" />
-                                <div className="h-3 bg-gray-200 rounded w-full" />
-                                <div className="h-2 bg-gray-200 rounded w-full" />
-                            </div>
-                        </div>
-                    ))}
-                    {campaigns.map((c) => (
-                        <Link key={c._id} href={`/campaigns/${c._id}`} className="group bg-white rounded-[24px] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                            <div className="h-48 bg-gray-100 overflow-hidden">
-                                {c.image ? (
-                                    <img src={c.image} alt={c.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                                ) : (
-                                    <div className="w-full h-full bg-gradient-to-br from-[#4F46E5]/20 to-[#7C3AED]/20 flex items-center justify-center">
-                                        <svg className="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="p-5">
-                                <span className="inline-block px-3 py-1 bg-indigo-50 text-[#4F46E5] text-xs font-medium rounded-full mb-3">{c.category || "General"}</span>
-                                <h3 className={`text-lg font-semibold text-gray-900 group-hover:text-[#4F46E5] transition-colors ${poppins.className}`}>{c.title}</h3>
-                                <p className={`text-sm text-gray-500 mt-1 ${inter.className}`}>by {c.creatorName || "Anonymous"}</p>
-                                <div className="mt-4">
-                                    <div className="flex justify-between text-sm mb-1.5">
-                                        <span className={`font-medium text-gray-900 ${inter.className}`}>{c.raisedAmount || 0} credits</span>
-                                        <span className={`text-gray-500 ${inter.className}`}>goal: {c.fundingGoal || 0}</span>
-                                    </div>
-                                    <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                                        <div className="h-full bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] rounded-full transition-all duration-500" style={{ width: `${Math.min(100, ((c.raisedAmount || 0) / (c.fundingGoal || 1)) * 100)}%` }} />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    {campaigns.length === 0 ? (
+                        Array.from({ length: 3 }).map((_, i) => (
+                            <div key={i} className="bg-white rounded-[24px] overflow-hidden border border-slate-200/60 animate-pulse flex flex-col">
+                                <div className="h-64 bg-slate-200" />
+                                <div className="p-6 space-y-4">
+                                    <div className="h-3 bg-slate-200 rounded w-1/3" />
+                                    <div className="h-5 bg-slate-200 rounded w-3/4" />
+                                    <div className="h-3 bg-slate-200 rounded w-full" />
+                                    <div className="h-2 bg-slate-200 rounded w-full" />
+                                    <div className="flex justify-between">
+                                        <div className="h-4 bg-slate-200 rounded w-20" />
+                                        <div className="h-4 bg-slate-200 rounded w-16" />
                                     </div>
                                 </div>
-                                <div className="mt-4 flex items-center justify-between">
-                                    <span className={`text-xs text-gray-400 ${inter.className}`}>
-                                        {c.deadline ? `${Math.max(0, Math.ceil((new Date(c.deadline) - new Date()) / (1000 * 60 * 60 * 24)))} days left` : "No deadline"}
-                                    </span>
-                                    <span className="text-sm font-medium text-[#4F46E5] group-hover:translate-x-1 transition-transform">View Details →</span>
-                                </div>
                             </div>
-                        </Link>
-                    ))}
+                        ))
+                    ) : (
+                        campaigns.slice(0, 3).map((campaign, i) => {
+                            const pct = raisedPercent(campaign);
+                            return (
+                                <div key={i} className="bg-white rounded-[24px] overflow-hidden border border-slate-200/60 hover:shadow-2xl transition-all group flex flex-col">
+                                    <div className="relative overflow-hidden h-64">
+                                        <img className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={campaign.title} src={campaign.image || "/placeholder.jpg"} />
+                                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-indigo-700 flex items-center gap-1">
+                                            <span className="w-2 h-2 rounded-full bg-indigo-700 animate-pulse"></span>
+                                            TRENDING
+                                        </div>
+                                    </div>
+                                    <div className="p-6 space-y-6 flex-1 flex flex-col">
+                                        <div>
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest">{campaign.category || "General"}</span>
+                                                <span className="text-xs font-semibold text-emerald-700 flex items-center gap-1">
+                                                    <Timer size={14} />
+                                                    {campaign.daysLeft || "30"} days left
+                                                </span>
+                                            </div>
+                                            <h4 className="text-xl font-semibold text-slate-900 group-hover:text-indigo-700 transition-colors">{campaign.title}</h4>
+                                            <p className="text-sm text-slate-500 line-clamp-2 mt-3">{campaign.description}</p>
+                                        </div>
+                                        <div className="mt-auto space-y-3">
+                                            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                                                <div className="h-full bg-gradient-to-r from-emerald-500 to-sky-500" style={{ width: `${pct}%` }}></div>
+                                            </div>
+                                            <div className="flex justify-between items-center font-semibold">
+                                                <div className="space-y-1">
+                                                    <p className="text-slate-900">{formatCurrency(campaign.raised || campaign.raisedAmount)}</p>
+                                                    <p className="text-[10px] text-slate-500 uppercase">Raised ({pct}%)</p>
+                                                </div>
+                                                <div className="text-right space-y-1">
+                                                    <p className="text-slate-900">{formatNumber(campaign.backers)}</p>
+                                                    <p className="text-[10px] text-slate-500 uppercase">Backers</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })
+                    )}
+                </div>
+                <div className="mt-16 text-center">
+                    <Link href="/explore" className="inline-block px-10 py-4 border-2 border-indigo-700 text-indigo-700 font-semibold rounded-xl hover:bg-indigo-700 hover:text-white transition-all duration-300">Explore All 400+ Active Projects</Link>
                 </div>
             </div>
         </section>

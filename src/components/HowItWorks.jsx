@@ -1,33 +1,42 @@
 "use client";
-import { Poppins, Inter } from "next/font/google";
-import { howItWorks } from "@/lib/homeData";
-
-const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700", "800"] });
-const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
+import { Lightbulb, Users, Rocket, ArrowRight } from "lucide-react";
 
 export default function HowItWorks() {
     return (
-        <section id="how-it-works" className="py-20 bg-white">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-12">
-                    <h2 className={`text-3xl md:text-4xl font-bold text-gray-900 ${poppins.className}`}>How It Works</h2>
-                    <p className={`mt-3 text-gray-500 max-w-lg mx-auto ${inter.className}`}>Get started in three simple steps</p>
+        <section className="py-20">
+            <div className="max-w-7xl mx-auto px-5">
+                <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
+                    <div className="space-y-3">
+                        <h2 className="text-4xl font-bold text-slate-900">How FundSpark Works</h2>
+                        <p className="text-lg text-slate-500 max-w-xl">Transparent, secure, and built for builders. We streamline the path from idea to impact.</p>
+                    </div>
+                    <a className="group flex items-center gap-1 font-semibold text-indigo-700" href="#">
+                        View Detailed Process
+                        <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                    </a>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {howItWorks.map((step, i) => (
-                        <div key={i} className="group relative bg-[#F8FAFC] rounded-[24px] p-8 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                                {i + 1}
-                            </div>
-                            <div className="w-16 h-16 mx-auto bg-indigo-50 rounded-[20px] flex items-center justify-center mb-5 group-hover:bg-[#4F46E5] group-hover:text-white transition-all duration-300">
-                                <svg className="w-7 h-7 text-[#4F46E5] group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={step.icon} />
-                                </svg>
-                            </div>
-                            <h3 className={`text-lg font-semibold text-gray-900 mb-2 ${poppins.className}`}>{step.title}</h3>
-                            <p className={`text-sm text-gray-500 leading-relaxed ${inter.className}`}>{step.desc}</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <div className="relative group p-6 rounded-3xl transition-all hover:bg-white hover:shadow-2xl hover:shadow-indigo-500/5">
+                        <div className="w-16 h-16 rounded-2xl bg-indigo-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <Lightbulb size={28} className="text-indigo-700" />
                         </div>
-                    ))}
+                        <h3 className="text-xl font-semibold mb-3 text-slate-900">Submit Your Idea</h3>
+                        <p className="text-slate-500 leading-relaxed">Present your vision with detailed roadmap, financial goals, and a compelling story for the community.</p>
+                    </div>
+                    <div className="relative group p-6 rounded-3xl transition-all hover:bg-white hover:shadow-2xl hover:shadow-indigo-500/5">
+                        <div className="w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <Users size={28} className="text-emerald-700" />
+                        </div>
+                        <h3 className="text-xl font-semibold mb-3 text-slate-900">Gather Momentum</h3>
+                        <p className="text-slate-500 leading-relaxed">Engage with early adopters, host virtual sessions, and grow your funding through our social ecosystem.</p>
+                    </div>
+                    <div className="relative group p-6 rounded-3xl transition-all hover:bg-white hover:shadow-2xl hover:shadow-indigo-500/5">
+                        <div className="w-16 h-16 rounded-2xl bg-violet-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <Rocket size={28} className="text-violet-700" />
+                        </div>
+                        <h3 className="text-xl font-semibold mb-3 text-slate-900">Launch & Scale</h3>
+                        <p className="text-slate-500 leading-relaxed">Withdraw your funds, execute your roadmap, and keep your backers updated on your journey to success.</p>
+                    </div>
                 </div>
             </div>
         </section>

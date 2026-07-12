@@ -1,18 +1,19 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
-import { Poppins, Inter } from "next/font/google";
+import Link from "next/link";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import ExploreFilters from "@/components/ExploreFilters";
 import ExploreCard, { ExploreCardSkeleton } from "@/components/ExploreCard";
-
-const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700", "800"] });
-const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
 
 export default function ExplorePage() {
     const [campaigns, setCampaigns] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState("");
-    const [sort, setSort] = useState("newest");
+    const [sort, setSort] = useState("most_funded");
+    const [statusFilter, setStatusFilter] = useState([]);
+    const [goalMin, setGoalMin] = useState(0);
+    const [goalMax, setGoalMax] = useState(100000000);
 
     useEffect(() => {
         fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/campaigns`, { cache: 'no-store' })
@@ -37,85 +38,128 @@ export default function ExplorePage() {
             result = result.filter(c => c.category === category);
         }
 
+        if (statusFilter.length > 0) {
+            result = result.filter(c => {
+                const raised = c.raisedAmount || 0;
+                const goal = c.fundingGoal || 1;
+                const pct = (raised / goal) * 100;
+                const deadline = c.deadline ? new Date(c.deadline) : null;
+                const daysLeft = deadline ? Math.ceil((deadline - new Date()) / (1000 * 60 * 60 * 24)) : 999;
+                const expired = deadline && deadline < new Date();
+
+                const matches = [];
+                if (statusFilter.includes("fully_funded") && pct >= 100) matches.push(true);
+                if (statusFilter.includes("in_progress") && pct < 100 && !expired) matches.push(true);
+                if (statusFilter.includes("ending_soon") && daysLeft <= 7 && daysLeft > 0 && !expired) matches.push(true);
+
+                return matches.length > 0;
+            });
+        }
+
+        result = result.filter(c => {
+            const g = c.fundingGoal || 0;
+            return g >= goalMin && g <= goalMax;
+        });
+
         switch (sort) {
+            case "most_funded": result.sort((a, b) => (b.raisedAmount || 0) - (a.raisedAmount || 0)); break;
             case "newest": result.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)); break;
-            case "oldest": result.sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0)); break;
-            case "most_raised": result.sort((a, b) => (b.raisedAmount || 0) - (a.raisedAmount || 0)); break;
-            case "least_raised": result.sort((a, b) => (a.raisedAmount || 0) - (b.raisedAmount || 0)); break;
-            case "deadline": result.sort((a, b) => new Date(a.deadline || 0) - new Date(b.deadline || 0)); break;
+            case "ending_soon": result.sort((a, b) => new Date(a.deadline || 0) - new Date(b.deadline || 0)); break;
+            case "smallest_goals": result.sort((a, b) => (a.fundingGoal || 0) - (b.fundingGoal || 0)); break;
         }
 
         return result;
-    }, [campaigns, search, category, sort]);
+    }, [campaigns, search, category, sort, statusFilter, goalMin, goalMax]);
 
     return (
         <div>
-            {/* Hero header */}
-            <div className="bg-gradient-to-br from-[#4F46E5] via-[#5B52E8] to-[#7C3AED] pt-28 pb-16">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="max-w-2xl">
-                        <div className="w-12 h-12 bg-white/10 backdrop-blur-xl rounded-[16px] flex items-center justify-center border border-white/10 mb-5">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+            {/* Hero Search Section */}
+            <section className="mb-16 pt-24">
+                <div className="max-w-7xl mx-auto px-5">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                        <div className="flex-1 max-w-2xl">
+                            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-2">Discover Innovation</h1>
+                            <p className="text-lg text-slate-500 mb-6">Support the creators building the future of technology, community, and health.</p>
+                            <div className="relative group">
+                                <Search size={20} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-700 transition-colors" />
+                                <input
+                                    type="text"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    placeholder="Search projects, creators, or categories..."
+                                    className="w-full pl-14 pr-6 py-4 bg-white border-none rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-200 transition-all text-base placeholder:text-slate-400"
+                                />
+                            </div>
                         </div>
-                        <h1 className={`text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-3 ${poppins.className}`}>
-                            Explore Campaigns
-                        </h1>
-                        <p className={`text-base md:text-lg text-white/70 max-w-xl ${inter.className}`}>
-                            Discover innovative projects and support creators who are making a difference.
-                        </p>
+                        <div className="flex items-center gap-3">
+                            <span className="text-sm font-semibold text-slate-500 whitespace-nowrap">Sort by:</span>
+                            <select
+                                value={sort}
+                                onChange={(e) => setSort(e.target.value)}
+                                className="bg-white border-none rounded-lg shadow-sm px-4 py-3 focus:ring-2 focus:ring-indigo-200 cursor-pointer text-sm font-semibold text-slate-700"
+                            >
+                                <option value="most_funded">Most Funded</option>
+                                <option value="newest">Recently Added</option>
+                                <option value="ending_soon">Ending Soon</option>
+                                <option value="smallest_goals">Smallest Goals</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            {/* Filters */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-7 relative z-10">
-                <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 p-5">
+            {/* Main Content */}
+            <div className="max-w-7xl mx-auto px-5">
+                <div className="flex flex-col md:flex-row gap-10">
+                    {/* Sidebar Filters */}
                     <ExploreFilters
-                        search={search}
-                        onSearchChange={setSearch}
                         category={category}
                         onCategoryChange={setCategory}
-                        sort={sort}
-                        onSortChange={setSort}
+                        statusFilter={statusFilter}
+                        onStatusFilterChange={setStatusFilter}
+                        goalMin={goalMin}
+                        goalMax={goalMax}
+                        onGoalMinChange={setGoalMin}
+                        onGoalMaxChange={setGoalMax}
+                        onReset={() => { setCategory(""); setSearch(""); setStatusFilter([]); setGoalMin(0); setGoalMax(100000000); }}
                     />
-                </div>
-            </div>
 
-            {/* Results */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-                <div className="flex items-center justify-between mb-6">
-                    <p className={`text-sm text-gray-500 ${inter.className}`}>
-                        {loading ? "Loading..." : `${filtered.length} campaign${filtered.length !== 1 ? "s" : ""} found`}
-                    </p>
-                    {(search || category) && (
-                        <button
-                            onClick={() => { setSearch(""); setCategory(""); }}
-                            className={`text-sm text-[#4F46E5] hover:text-[#4338CA] font-medium transition-colors ${inter.className}`}
-                        >
-                            Clear filters
-                        </button>
-                    )}
-                </div>
+                    {/* Campaign Grid */}
+                    <div className="flex-1">
+                        {loading ? (
+                            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                                {Array.from({ length: 6 }).map((_, i) => <ExploreCardSkeleton key={i} />)}
+                            </div>
+                        ) : filtered.length === 0 ? (
+                            <div className="text-center py-20">
+                                <Search size={64} className="mx-auto text-slate-300 mb-4" />
+                                <h3 className="text-lg font-semibold text-slate-900 mb-1">No campaigns found</h3>
+                                <p className="text-sm text-slate-500">Try adjusting your search or filter criteria.</p>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    {filtered.map((c) => <ExploreCard key={c._id} campaign={c} />)}
+                                </div>
 
-                {loading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {Array.from({ length: 6 }).map((_, i) => <ExploreCardSkeleton key={i} />)}
+                                {/* Pagination */}
+                                <div className="mt-16 flex justify-center items-center gap-2">
+                                    <button type="button" className="w-10 h-10 flex items-center justify-center rounded-full border border-slate-300 hover:bg-white transition-colors">
+                                        <ChevronLeft size={20} className="text-slate-500" />
+                                    </button>
+                                    <button type="button" className="w-10 h-10 flex items-center justify-center rounded-full bg-indigo-700 text-white font-semibold text-sm">1</button>
+                                    <button type="button" className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white transition-colors font-semibold text-sm text-slate-700">2</button>
+                                    <button type="button" className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white transition-colors font-semibold text-sm text-slate-700">3</button>
+                                    <span className="text-slate-400 px-2">...</span>
+                                    <button type="button" className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white transition-colors font-semibold text-sm text-slate-700">12</button>
+                                    <button type="button" className="w-10 h-10 flex items-center justify-center rounded-full border border-slate-300 hover:bg-white transition-colors">
+                                        <ChevronRight size={20} className="text-slate-500" />
+                                    </button>
+                                </div>
+                            </>
+                        )}
                     </div>
-                ) : filtered.length === 0 ? (
-                    <div className="text-center py-20">
-                        <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                        <h3 className={`text-lg font-semibold text-gray-900 mb-1 ${poppins.className}`}>No campaigns found</h3>
-                        <p className={`text-sm text-gray-500 ${inter.className}`}>Try adjusting your search or filter criteria.</p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filtered.map((c) => <ExploreCard key={c._id} campaign={c} />)}
-                    </div>
-                )}
+                </div>
             </div>
         </div>
     );

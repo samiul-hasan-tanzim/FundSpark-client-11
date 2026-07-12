@@ -1,11 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import HeroSlider from "@/components/HeroSlider";
-import TopCampaigns from "@/components/TopCampaigns";
-import HowItWorks from "@/components/HowItWorks";
-import Categories from "@/components/Categories";
 import PlatformStats from "@/components/PlatformStats";
-import Testimonials from "@/components/Testimonials";
+import HowItWorks from "@/components/HowItWorks";
+import TopCampaigns from "@/components/TopCampaigns";
 import Newsletter from "@/components/Newsletter";
 
 export default function Home() {
@@ -22,11 +20,9 @@ export default function Home() {
     return (
         <>
             <HeroSlider />
-            <TopCampaigns campaigns={campaigns} />
-            <HowItWorks />
-            <Categories />
             <PlatformStats stats={stats} />
-            <Testimonials />
+            <HowItWorks />
+            <TopCampaigns campaigns={campaigns} />
             <Newsletter />
         </>
     );

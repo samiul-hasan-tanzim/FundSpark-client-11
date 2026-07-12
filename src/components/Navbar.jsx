@@ -14,23 +14,17 @@ const Navbar = () => {
     const { data: session } = useSession();
     const pathname = usePathname();
     const [open, setOpen] = useState(false);
-    const [scrolled, setScrolled] = useState(false);
     const [profile, setProfile] = useState(null);
     const menuRef = useRef(null);
 
     const isActive = (path) => pathname === path || (path !== '/' && pathname.startsWith(path));
 
     useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 20);
-        window.addEventListener("scroll", onScroll, { passive: true });
-        return () => window.removeEventListener("scroll", onScroll);
-    }, []);
-
-    useEffect(() => {
         if (session?.user?.email) {
-            fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/profile`, { cache: 'no-store',
+            fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/profile`, {
+                cache: 'no-store',
                 headers: { Authorization: `Bearer ${session.user.email}` },
-            }).then(r => r.json()).then(setProfile).catch(() => {});
+            }).then(r => r.json()).then(setProfile).catch(() => { });
         }
     }, [session]);
 
@@ -47,7 +41,7 @@ const Navbar = () => {
     const linkBase = `text-sm font-medium tracking-wide transition-all duration-200 ${inter.className}`;
 
     return (
-        <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${scrolled ? "bg-white/80 backdrop-blur-2xl shadow-[0_1px_30px_-10px_rgba(0,0,0,0.12)] border-b border-white/20" : "bg-transparent"}`}>
+        <nav className="sticky top-0 w-full z-50 bg-white/70 backdrop-blur-xl shadow-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16 lg:h-20">
                     {/* Logo */}
@@ -58,23 +52,23 @@ const Navbar = () => {
                                 <path d="M11.9 21c-2 0-3.7-1.2-4.5-2.8-1.2-2.4-.7-5.2.5-7 .4-.6.8-1.2.8-2s-.5-2.4-.8-3.2c1.6.4 3.2 1.6 4.3 3.6 1.1 2 .7 4-.4 5.5-.8 1-1.2 2-.4 2.8.4.4.8.4 1.2.4s.8-.4.8-.8c0-.4-.4-.8-.8-1.6.8 0 1.6.4 2 1.2.4 1.2 0 2.8-1.2 3.6-.4.3-1.2.8-1.5.8z" />
                             </svg>
                         </div>
-                        <span className={`text-xl font-bold tracking-tight transition-colors duration-300 ${poppins.className} ${scrolled ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] bg-clip-text text-transparent" : "text-white"}`}>
+                        <span className={`text-xl font-bold tracking-tight transition-colors duration-300 ${poppins.className} ${"bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] bg-clip-text text-transparent"}`}>
                             FundSpark
                         </span>
                     </Link>
 
                     {/* Desktop nav */}
                     <div className="hidden lg:flex items-center gap-1">
-                        <Link href="/" className={`${linkBase} px-4 py-2 rounded-xl ${isActive("/") ? "text-[#4F46E5] bg-indigo-50/80" : scrolled ? "text-gray-600 hover:text-[#4F46E5] hover:bg-indigo-50/60" : "text-white/80 hover:text-white hover:bg-white/10"}`}>
+                        <Link href="/" className={`${linkBase} px-4 py-2 rounded-xl ${isActive("/") ? "text-[#4F46E5] bg-indigo-50/80" : "text-gray-600 hover:text-[#4F46E5] hover:bg-indigo-50/60"}`}>
                             Home
                         </Link>
-                        <Link href="/explore" className={`${linkBase} px-4 py-2 rounded-xl ${isActive("/explore") ? "text-[#4F46E5] bg-indigo-50/80" : scrolled ? "text-gray-600 hover:text-[#4F46E5] hover:bg-indigo-50/60" : "text-white/80 hover:text-white hover:bg-white/10"}`}>
+                        <Link href="/explore" className={`${linkBase} px-4 py-2 rounded-xl ${isActive("/explore") ? "text-[#4F46E5] bg-indigo-50/80" : "text-gray-600 hover:text-[#4F46E5] hover:bg-indigo-50/60"}`}>
                             Explore Campaigns
                         </Link>
 
                         {user ? (
                             <>
-                                <Link href={dashboardHref} className={`${linkBase} px-4 py-2 rounded-xl ${isActive(dashboardHref) ? "text-[#4F46E5] bg-indigo-50/80" : scrolled ? "text-gray-600 hover:text-[#4F46E5] hover:bg-indigo-50/60" : "text-white/80 hover:text-white hover:bg-white/10"}`}>
+                                <Link href={dashboardHref} className={`${linkBase} px-4 py-2 rounded-xl ${isActive(dashboardHref) ? "text-[#4F46E5] bg-indigo-50/80" : "text-gray-600 hover:text-[#4F46E5] hover:bg-indigo-50/60"}`}>
                                     Dashboard
                                 </Link>
 
@@ -88,7 +82,7 @@ const Navbar = () => {
                                 <NotificationDropdown />
 
                                 <div className="relative group">
-                                    <button className={`w-9 h-9 rounded-full overflow-hidden border-2 transition-all duration-200 ${scrolled ? "border-gray-200 hover:border-[#4F46E5] shadow-sm" : "border-white/40 hover:border-white"}`}>
+                                    <button className={`w-9 h-9 rounded-full overflow-hidden border-2 transition-all duration-200 ${"border-gray-200 hover:border-[#4F46E5] shadow-sm"}`}>
                                         {user.image ? (
                                             <img src={user.image} alt="" className="w-full h-full object-cover" />
                                         ) : (
@@ -118,12 +112,12 @@ const Navbar = () => {
                             </>
                         ) : (
                             <>
-                                <Link href="/login" className={`${linkBase} px-4 py-2 rounded-xl ${isActive("/login") ? "text-[#4F46E5] bg-indigo-50/80" : scrolled ? "text-gray-600 hover:text-[#4F46E5] hover:bg-indigo-50/60" : "text-white/80 hover:text-white hover:bg-white/10"}`}>
+                                <Link href="/login" className={`${linkBase} px-4 py-2 rounded-xl ${isActive("/login") ? "text-[#4F46E5] bg-indigo-50/80" : "text-gray-600 hover:text-[#4F46E5] hover:bg-indigo-50/60"}`}>
                                     Login
                                 </Link>
                                 <Link
                                     href="/register"
-                                    className={`px-5 py-2.5 rounded-xl text-sm font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 ${inter.className} ${scrolled ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-indigo-500/25 hover:shadow-indigo-500/35" : "bg-white text-[#4F46E5] shadow-black/10 hover:shadow-black/20"}`}
+                                    className={`px-5 py-2.5 rounded-xl text-sm font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 ${inter.className} ${"bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-indigo-500/25 hover:shadow-indigo-500/35"}`}
                                 >
                                     Register
                                 </Link>
@@ -134,7 +128,7 @@ const Navbar = () => {
                     {/* Mobile toggle */}
                     <button
                         onClick={() => setOpen(!open)}
-                        className={`lg:hidden relative w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-200 ${scrolled ? "text-gray-600 hover:text-[#4F46E5] hover:bg-gray-100" : "text-white hover:text-white hover:bg-white/10"}`}
+                        className={`lg:hidden relative w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-200 ${"text-gray-600 hover:text-[#4F46E5] hover:bg-gray-100"}`}
                         aria-label="Toggle menu"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -189,13 +183,13 @@ const Navbar = () => {
                                 <Link href="/register" onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-semibold transition-all text-white bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-center ${inter.className}`}>
                                     Register
                                 </Link>
-                                </>
-                            )}
-                        </div>
+                            </>
+                        )}
                     </div>
                 </div>
-            </nav>
-        );
-    };
+            </div>
+        </nav>
+    );
+};
 
 export default Navbar;

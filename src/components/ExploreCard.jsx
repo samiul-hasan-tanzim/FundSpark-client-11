@@ -1,28 +1,21 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Poppins, Inter } from "next/font/google";
+import { Heart } from "lucide-react";
 
-const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700"] });
-const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
-
-const categoryColors = {
-    Technology: { bg: "bg-indigo-50", text: "text-indigo-600" },
-    Health: { bg: "bg-emerald-50", text: "text-emerald-600" },
-    Community: { bg: "bg-sky-50", text: "text-sky-600" },
-    Education: { bg: "bg-purple-50", text: "text-purple-600" },
-    Art: { bg: "bg-amber-50", text: "text-amber-600" },
-    Environment: { bg: "bg-emerald-50", text: "text-emerald-600" },
+const categoryBadge = {
+    Technology: "bg-indigo-700/90 text-white",
+    Health: "bg-emerald-700/90 text-white",
+    Community: "bg-sky-700/90 text-white",
+    Education: "bg-purple-700/90 text-white",
+    Art: "bg-pink-600/90 text-white",
+    Environment: "bg-emerald-700/90 text-white",
 };
 
-function timeAgo(date) {
-    const diff = Date.now() - date.getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 60) return `${mins}m ago`;
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return `${hrs}h ago`;
-    const days = Math.floor(hrs / 24);
-    return `${days}d ago`;
+function formatNumber(n) {
+    if (n >= 1000000) return `$${(n / 1000000).toFixed(1)}M`;
+    if (n >= 1000) return `$${(n / 1000).toFixed(1)}K`;
+    return `$${n}`;
 }
 
 export default function ExploreCard({ campaign }) {
@@ -38,79 +31,55 @@ export default function ExploreCard({ campaign }) {
         ? Math.ceil((deadline - now) / (1000 * 60 * 60 * 24))
         : null;
     const progress = Math.min(100, ((campaign.raisedAmount || 0) / (campaign.fundingGoal || 1)) * 100);
-    const colors = categoryColors[campaign.category] || { bg: "bg-gray-50", text: "text-gray-600" };
+    const badge = categoryBadge[campaign.category] || "bg-slate-700/90 text-white";
 
     return (
-        <Link href={`/explore/${campaign._id}`} className="group block bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100/50">
-            {/* Image */}
-            <div className="relative h-52 bg-gray-100 overflow-hidden">
+        <Link href={`/explore/${campaign._id}`} className="group block bg-white rounded-lg border border-slate-200/30 overflow-hidden flex flex-col h-full hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(53,37,205,0.08)] transition-all duration-300">
+            <div className="relative h-48 overflow-hidden">
                 {campaign.image ? (
-                    <img src={campaign.image} alt={campaign.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={campaign.image} alt={campaign.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                 ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                        <svg className="w-14 h-14 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
+                        <svg className="w-14 h-14 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
                 )}
-                {/* Category badge */}
-                <span className={`absolute top-3 left-3 px-3 py-1 ${colors.bg} ${colors.text} text-xs font-semibold rounded-full shadow-sm`}>
-                    {campaign.category || "General"}
+                <span className={`absolute top-3 left-3 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wider backdrop-blur-md ${badge}`}>
+                    {(campaign.category || "General").toUpperCase()}
                 </span>
                 {expired ? (
-                    <span className="absolute top-3 right-3 px-3 py-1 bg-gray-500 text-white text-xs font-semibold rounded-full shadow-sm">Ended {timeAgo(deadline)}</span>
-                ) : daysLeft !== null && daysLeft <= 7 && (
-                    <span className="absolute top-3 right-3 px-3 py-1 bg-red-500 text-white text-xs font-semibold rounded-full shadow-sm">
-                        {daysLeft === 0 ? "Ending" : `${daysLeft}d left`}
+                    <span className="absolute top-3 right-3 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wider bg-slate-700/80 text-white backdrop-blur-md">Ended</span>
+                ) : daysLeft !== null && daysLeft <= 7 ? (
+                    <span className="absolute top-3 right-3 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wider bg-red-500/80 text-white backdrop-blur-md">
+                        {daysLeft === 0 ? "Ending Today" : `${daysLeft}d left`}
                     </span>
-                )}
+                ) : null}
             </div>
-
-            {/* Content */}
-            <div className="p-5">
-                <h3 className={`text-base font-semibold text-gray-900 group-hover:text-[#4F46E5] transition-colors leading-snug ${poppins.className}`}>
-                    {campaign.title}
-                </h3>
-                <p className={`text-sm text-gray-500 mt-1.5 ${inter.className}`}>
-                    by {campaign.creatorName || "Anonymous"}
-                </p>
-
-                {/* Progress */}
-                <div className="mt-4">
-                    <div className="flex justify-between items-center mb-2">
-                        <span className={`text-sm font-semibold text-gray-900 ${inter.className}`}>{campaign.raisedAmount || 0} credits</span>
-                        <span className={`text-xs text-gray-400 ${inter.className}`}>{progress.toFixed(0)}%</span>
+            <div className="p-5 flex flex-col flex-1">
+                <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-xl font-semibold text-slate-900 leading-tight group-hover:text-indigo-700 transition-colors">{campaign.title}</h3>
+                    <Heart size={20} className="text-slate-400 hover:text-red-500 transition-colors shrink-0 ml-2" />
+                </div>
+                <p className="text-sm text-slate-500 line-clamp-2 mb-4">{campaign.story || "No description available."}</p>
+                <div className="mt-auto">
+                    <div className="flex justify-between items-end mb-2">
+                        <span className="text-sm font-semibold text-indigo-700">{formatNumber(campaign.raisedAmount || 0)} <span className="text-slate-400 font-normal">raised</span></span>
+                        <span className="text-sm font-semibold text-emerald-600">{progress.toFixed(0)}%</span>
                     </div>
-                    <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                            className="h-full bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] rounded-full transition-all duration-700"
-                            style={{ width: `${progress}%` }}
-                        />
+                    <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden mb-4">
+                        <div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-sky-400" style={{ width: `${Math.min(100, progress)}%` }} />
                     </div>
-                    <div className="flex justify-between items-center mt-2">
-                        <span className={`text-xs text-gray-400 ${inter.className}`}>Goal: {campaign.fundingGoal || 0} credits</span>
-                        {daysLeft !== null && (
-                            <span className={`text-xs text-gray-400 ${inter.className}`}>
-                                {daysLeft > 7 ? `${daysLeft} days left` : ""}
-                            </span>
+                    <div className="flex justify-between items-center text-[11px] font-semibold text-slate-400 tracking-wider uppercase">
+                        <span>{(campaign.backersCount || 0).toLocaleString()} Backers</span>
+                        {expired ? (
+                            <span className="text-red-500 font-bold">ENDED</span>
+                        ) : daysLeft !== null ? (
+                            <span>{daysLeft === 0 ? "Ending" : `${daysLeft} Days Left`}</span>
+                        ) : (
+                            <span>Ongoing</span>
                         )}
                     </div>
-                </div>
-
-                {/* Footer */}
-                <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] flex items-center justify-center text-white text-[9px] font-bold">
-                            {(campaign.creatorName?.[0] || "C").toUpperCase()}
-                        </div>
-                        <span className={`text-xs text-gray-500 ${inter.className}`}>{campaign.creatorName?.split(" ")[0] || "Creator"}</span>
-                    </div>
-                    <span className="text-xs font-medium text-[#4F46E5] group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
-                        View Details
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                    </span>
                 </div>
             </div>
         </Link>
@@ -119,18 +88,16 @@ export default function ExploreCard({ campaign }) {
 
 export function ExploreCardSkeleton() {
     return (
-        <div className="bg-white rounded-[20px] overflow-hidden shadow-sm border border-gray-100/50 animate-pulse">
-            <div className="h-52 bg-gray-200" />
-            <div className="p-5 space-y-3">
-                <div className="h-4 bg-gray-200 rounded w-3/4" />
-                <div className="h-3 bg-gray-200 rounded w-1/2" />
-                <div className="mt-4 space-y-2">
-                    <div className="h-3 bg-gray-200 rounded w-full" />
-                    <div className="h-2.5 bg-gray-200 rounded w-full" />
-                    <div className="h-3 bg-gray-200 rounded w-2/3" />
-                </div>
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                    <div className="h-3 bg-gray-200 rounded w-1/3" />
+        <div className="bg-white rounded-lg border border-slate-200/30 overflow-hidden animate-pulse flex flex-col">
+            <div className="h-48 bg-slate-200" />
+            <div className="p-5 space-y-3 flex-1">
+                <div className="h-5 bg-slate-200 rounded w-3/4" />
+                <div className="h-4 bg-slate-200 rounded w-full" />
+                <div className="h-4 bg-slate-200 rounded w-2/3" />
+                <div className="mt-auto pt-4 space-y-2">
+                    <div className="h-3 bg-slate-200 rounded w-full" />
+                    <div className="h-2 bg-slate-200 rounded w-full" />
+                    <div className="h-3 bg-slate-200 rounded w-1/2" />
                 </div>
             </div>
         </div>
