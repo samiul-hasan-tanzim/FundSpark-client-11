@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Poppins, Inter } from "next/font/google";
 import { authClient } from "@/lib/auth-client";
+import toast from "react-hot-toast";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700", "800"] });
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
@@ -118,6 +119,7 @@ export default function CampaignDetailsPage() {
                 setContributeError(data.message || "Contribution failed");
             } else {
                 setContributeSuccess(true);
+                toast.success("Contribution submitted successfully!");
                 setContributionAmount("");
                 setProfile(prev => prev ? { ...prev, credits: prev.credits - amount } : prev);
                 fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/campaigns/${params.id}`, { cache: 'no-store' })
@@ -126,7 +128,7 @@ export default function CampaignDetailsPage() {
                     .catch(() => { });
             }
         } catch {
-            setContributeError("Network error. Please try again.");
+            toast.error("Network error. Please try again.");
         }
         setContributing(false);
     };
@@ -154,11 +156,12 @@ export default function CampaignDetailsPage() {
                 setReportError(data.message || "Failed to submit report");
             } else {
                 setReportSuccess(true);
+                toast.success("Report submitted. Our team will review it.");
                 setReportReason("");
                 setTimeout(() => setShowReportModal(false), 1500);
             }
         } catch {
-            setReportError("Network error. Please try again.");
+            toast.error("Network error. Please try again.");
         }
         setReporting(false);
     };

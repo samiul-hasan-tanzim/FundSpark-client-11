@@ -4,6 +4,7 @@ import { useSession } from "@/lib/auth-client";
 import { useParams, useRouter } from "next/navigation";
 import { Poppins, Inter } from "next/font/google";
 import { categories } from "@/lib/homeData";
+import toast from "react-hot-toast";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700", "800"] });
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
@@ -80,8 +81,10 @@ export default function EditCampaign() {
             });
             const data = await res.json();
             if (!res.ok) {
+                toast.error(data.message || "Failed to update campaign");
                 setApiError(data.message || "Failed to update campaign.");
             } else {
+                toast.success("Campaign updated successfully!");
                 setSuccess(true);
                 setTimeout(() => router.push("/dashboard/creator/my-campaigns"), 1500);
             }

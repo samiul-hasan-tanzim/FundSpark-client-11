@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Poppins, Inter } from "next/font/google";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
+import toast from "react-hot-toast";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700"] });
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
@@ -58,8 +59,10 @@ const LoginPage = () => {
 
         if (error) {
             setApiError(error.message || error.statusText || "Login failed. Please try again.");
+            toast.error(error.message || "Login failed");
             setLoading(false);
         } else if (data?.token && data?.user?.email) {
+            toast.success("Welcome back!");
             await initializeCredits(data.user.email);
             const role = data?.user?.role || "supporter";
             window.location.href = role === "creator" ? "/dashboard/creator" : "/dashboard/supporter";
@@ -70,10 +73,15 @@ const LoginPage = () => {
 
     const handelSocialAuth = async () => {
         setLoading(true);
-        await authClient.signIn.social({
-            provider: "google",
-            callbackURL: "/",
-        });
+        try {
+            await authClient.signIn.social({
+                provider: "google",
+                callbackURL: "/",
+            });
+            toast.success("Welcome back!");
+        } catch (err) {
+            toast.error(err?.message || "Social login failed");
+        }
         setLoading(false);
     };
 

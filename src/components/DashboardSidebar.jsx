@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { useSession } from "@/lib/auth-client";
 import NotificationDropdown from "@/components/NotificationDropdown";
+import toast from "react-hot-toast";
 import { Inter, Poppins } from "next/font/google";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700"] });
@@ -121,7 +122,7 @@ export default function DashboardSidebar({ user, credits, role }) {
                 {/* Logout */}
                 <div className="px-3 py-4 border-t border-gray-100">
                     <button
-                        onClick={async () => { await authClient.signOut(); window.location.href = "/"; }}
+                        onClick={async () => { await authClient.signOut(); toast.success("Logged out successfully"); window.location.href = "/"; }}
                         className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-200 ${inter.className} ${collapsed ? "justify-center" : ""}`}
                     >
                         <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -194,7 +195,7 @@ export default function DashboardSidebar({ user, credits, role }) {
 
                 <div className="px-3 py-4 border-t border-gray-100">
                     <button
-                        onClick={async () => { await authClient.signOut(); window.location.href = "/"; }}
+                        onClick={async () => { await authClient.signOut(); toast.success("Logged out successfully"); window.location.href = "/"; }}
                         className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-200 ${inter.className}`}
                     >
                         <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

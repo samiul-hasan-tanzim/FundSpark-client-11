@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Poppins, Inter } from "next/font/google";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
+import toast from "react-hot-toast";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700"] });
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
@@ -105,7 +106,9 @@ const SignUpPage = () => {
             });
             if (error) {
                 setApiError(error.message || error.statusText || "Registration failed. Please try again.");
+                toast.error(error.message || "Registration failed");
             } else if (data?.token && data?.user?.email) {
+                toast.success("Account created successfully!");
                 await initializeCredits(data.user.email);
                 window.location.href = role === "creator" ? "/dashboard/creator" : "/dashboard/supporter";
             }

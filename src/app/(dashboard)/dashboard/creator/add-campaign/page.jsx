@@ -4,6 +4,7 @@ import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { Poppins, Inter } from "next/font/google";
 import { categories } from "@/lib/homeData";
+import toast from "react-hot-toast";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700", "800"] });
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
@@ -83,8 +84,10 @@ export default function AddCampaign() {
             });
             const data = await res.json();
             if (!res.ok) {
+                toast.error(data.message || "Failed to create campaign");
                 setApiError(data.message || "Failed to create campaign.");
             } else {
+                toast.success("Campaign created successfully! Pending admin approval.");
                 setSuccess(true);
                 setTimeout(() => router.push("/dashboard/creator/my-campaigns"), 1500);
             }

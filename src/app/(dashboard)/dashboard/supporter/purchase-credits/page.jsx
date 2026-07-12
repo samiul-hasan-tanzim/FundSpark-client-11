@@ -3,6 +3,7 @@ import { useState, useEffect, Suspense, useRef } from "react";
 import { useSession } from "@/lib/auth-client";
 import { useSearchParams } from "next/navigation";
 import { Poppins, Inter } from "next/font/google";
+import toast from "react-hot-toast";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700", "800"] });
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
@@ -64,8 +65,14 @@ function PurchaseCreditsContent() {
                 body: JSON.stringify({ credits: selected.credits, amount: selected.price }),
             });
             const data = await res.json();
-            if (data.url) window.location.href = data.url;
+            if (data.url) {
+                toast.success("Redirecting to payment...");
+                window.location.href = data.url;
+            } else {
+                toast.error(data.message || "Failed to create checkout");
+            }
         } catch (err) {
+            toast.error("Something went wrong");
             console.error(err);
         } finally {
             setProcessing(false);

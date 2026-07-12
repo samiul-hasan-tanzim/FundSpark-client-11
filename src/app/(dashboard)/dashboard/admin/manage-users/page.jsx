@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "@/lib/auth-client";
 import { Poppins, Inter } from "next/font/google";
+import toast from "react-hot-toast";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700"] });
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
@@ -19,12 +20,18 @@ export default function ManageUsers() {
     }, [session]);
 
     const handleRoleChange = async (email, newRole) => {
-        await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/users/role`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/users/role`, {
             method: "PUT",
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.user.email}` },
             body: JSON.stringify({ email, role: newRole }),
         });
-        setUsers(prev => prev.map(u => u.email === email ? { ...u, role: newRole } : u));
+        const data = await res.json();
+        if (res.ok) {
+            toast.success("User role updated!");
+            setUsers(prev => prev.map(u => u.email === email ? { ...u, role: newRole } : u));
+        } else {
+            toast.error(data.message || "Failed to update role");
+        }
     };
 
     const handleRemove = async (email) => {

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "@/lib/auth-client";
 import { Poppins, Inter } from "next/font/google";
+import toast from "react-hot-toast";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700"] });
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
@@ -31,21 +32,33 @@ export default function WithdrawalRequests() {
     useEffect(() => { setLoading(true); fetchWithdrawals(); }, [session, tab]);
 
     const handleApprove = async (id) => {
-        await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/withdrawals/approve`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/withdrawals/approve`, {
             method: "PUT",
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.user.email}` },
             body: JSON.stringify({ withdrawalId: id }),
         });
-        setWithdrawals(prev => prev.filter(w => w._id !== id));
+        const data = await res.json();
+        if (res.ok) {
+            toast.success("Withdrawal approved!");
+            setWithdrawals(prev => prev.filter(w => w._id !== id));
+        } else {
+            toast.error(data.message || "Failed to approve withdrawal");
+        }
     };
 
     const handleReject = async (id) => {
-        await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/withdrawals/reject`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/withdrawals/reject`, {
             method: "PUT",
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.user.email}` },
             body: JSON.stringify({ withdrawalId: id }),
         });
-        setWithdrawals(prev => prev.filter(w => w._id !== id));
+        const data = await res.json();
+        if (res.ok) {
+            toast.success("Withdrawal rejected!");
+            setWithdrawals(prev => prev.filter(w => w._id !== id));
+        } else {
+            toast.error(data.message || "Failed to reject withdrawal");
+        }
     };
 
     return (

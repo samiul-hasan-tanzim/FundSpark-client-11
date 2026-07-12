@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "@/lib/auth-client";
 import { Poppins, Inter } from "next/font/google";
+import toast from "react-hot-toast";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700"] });
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
@@ -44,11 +45,14 @@ export default function Withdrawals() {
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.user.email}` },
                 body: JSON.stringify({ amount: parseInt(amount) }),
             });
+            const data = await res.json();
             if (res.ok) {
-                const newW = await res.json();
-                setWithdrawals(prev => [newW, ...prev]);
+                toast.success("Withdrawal request submitted!");
+                setWithdrawals(prev => [data, ...prev]);
                 setAvailable(prev => prev - parseInt(amount));
                 setAmount("");
+            } else {
+                toast.error(data.message || "Failed to submit withdrawal");
             }
         } finally {
             setSubmitting(false);

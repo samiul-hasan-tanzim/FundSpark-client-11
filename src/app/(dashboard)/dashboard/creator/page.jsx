@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "@/lib/auth-client";
 import { Poppins, Inter } from "next/font/google";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700", "800"] });
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
@@ -43,9 +44,17 @@ export default function CreatorDashboard() {
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.user.email}` },
                 body: JSON.stringify({ contributionId: id, status }),
             });
+            const data = await res.json();
             if (res.ok) {
                 setContributions(prev => prev.filter(c => c._id !== id));
                 setStats(prev => ({ ...prev, pendingContributions: prev.pendingContributions - 1 }));
+                if (status === 'approved') {
+                    toast.success("Contribution approved!");
+                } else {
+                    toast.success("Contribution rejected!");
+                }
+            } else {
+                toast.error(data.message || "Failed to update contribution");
             }
         } finally {
             setProcessingId(null);

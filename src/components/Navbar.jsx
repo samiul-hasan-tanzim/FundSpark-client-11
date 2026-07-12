@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { authClient, useSession } from "@/lib/auth-client";
 import NotificationDropdown from "@/components/NotificationDropdown";
+import toast from "react-hot-toast";
 import { Inter, Poppins } from "next/font/google";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700"] });
@@ -103,7 +104,7 @@ const Navbar = () => {
                                         </div>
                                         <div className="px-2 py-1">
                                             <button
-                                                onClick={async () => { await authClient.signOut(); window.location.href = "/"; }}
+                                                onClick={async () => { await authClient.signOut(); toast.success("Logged out successfully"); window.location.href = "/"; }}
                                                 className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors ${inter.className}`}
                                             >
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
