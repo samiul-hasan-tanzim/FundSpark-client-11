@@ -37,6 +37,7 @@ export default function CampaignDetailsPage() {
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState(null);
 
+    // eslint-disable-next-line react-hooks/purity
     const [now, setNow] = useState(Date.now());
     useEffect(() => {
         const t = setInterval(() => setNow(Date.now()), 1000);
@@ -82,7 +83,7 @@ export default function CampaignDetailsPage() {
         })
             .then(r => r.json())
             .then(data => setProfile(data))
-            .catch(() => {});
+            .catch(() => { });
     }, [session]);
 
     const handleContribute = async (e) => {
@@ -122,7 +123,7 @@ export default function CampaignDetailsPage() {
                 fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/campaigns/${params.id}`, { cache: 'no-store' })
                     .then(r => r.json())
                     .then(data => { if (data) setCampaign(data); })
-                    .catch(() => {});
+                    .catch(() => { });
             }
         } catch {
             setContributeError("Network error. Please try again.");

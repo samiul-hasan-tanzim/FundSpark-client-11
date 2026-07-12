@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { authClient, useSession } from "@/lib/auth-client";
 import { Inter, Poppins } from "next/font/google";
 
@@ -9,10 +10,13 @@ const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
 
 const Navbar = () => {
     const { data: session } = useSession();
+    const pathname = usePathname();
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [profile, setProfile] = useState(null);
     const menuRef = useRef(null);
+
+    const isActive = (path) => pathname === path || (path !== '/' && pathname.startsWith(path));
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 20);
@@ -59,13 +63,16 @@ const Navbar = () => {
 
                     {/* Desktop nav */}
                     <div className="hidden lg:flex items-center gap-1">
-                        <Link href="/explore" className={`${linkBase} px-4 py-2 rounded-xl ${scrolled ? "text-gray-600 hover:text-[#4F46E5] hover:bg-indigo-50/60" : "text-white/80 hover:text-white hover:bg-white/10"}`}>
+                        <Link href="/" className={`${linkBase} px-4 py-2 rounded-xl ${isActive("/") ? "text-[#4F46E5] bg-indigo-50/80" : scrolled ? "text-gray-600 hover:text-[#4F46E5] hover:bg-indigo-50/60" : "text-white/80 hover:text-white hover:bg-white/10"}`}>
+                            Home
+                        </Link>
+                        <Link href="/explore" className={`${linkBase} px-4 py-2 rounded-xl ${isActive("/explore") ? "text-[#4F46E5] bg-indigo-50/80" : scrolled ? "text-gray-600 hover:text-[#4F46E5] hover:bg-indigo-50/60" : "text-white/80 hover:text-white hover:bg-white/10"}`}>
                             Explore Campaigns
                         </Link>
 
                         {user ? (
                             <>
-                                <Link href={dashboardHref} className={`${linkBase} px-4 py-2 rounded-xl ${scrolled ? "text-gray-600 hover:text-[#4F46E5] hover:bg-indigo-50/60" : "text-white/80 hover:text-white hover:bg-white/10"}`}>
+                                <Link href={dashboardHref} className={`${linkBase} px-4 py-2 rounded-xl ${isActive(dashboardHref) ? "text-[#4F46E5] bg-indigo-50/80" : scrolled ? "text-gray-600 hover:text-[#4F46E5] hover:bg-indigo-50/60" : "text-white/80 hover:text-white hover:bg-white/10"}`}>
                                     Dashboard
                                 </Link>
 
@@ -107,7 +114,7 @@ const Navbar = () => {
                             </>
                         ) : (
                             <>
-                                <Link href="/login" className={`${linkBase} px-4 py-2 rounded-xl ${scrolled ? "text-gray-600 hover:text-[#4F46E5] hover:bg-indigo-50/60" : "text-white/80 hover:text-white hover:bg-white/10"}`}>
+                                <Link href="/login" className={`${linkBase} px-4 py-2 rounded-xl ${isActive("/login") ? "text-[#4F46E5] bg-indigo-50/80" : scrolled ? "text-gray-600 hover:text-[#4F46E5] hover:bg-indigo-50/60" : "text-white/80 hover:text-white hover:bg-white/10"}`}>
                                     Login
                                 </Link>
                                 <Link
@@ -118,13 +125,6 @@ const Navbar = () => {
                                 </Link>
                             </>
                         )}
-
-                        <Link
-                            href="/register"
-                            className={`px-5 py-2.5 rounded-xl border-2 text-sm font-semibold transition-all duration-200 ml-1 ${inter.className} ${scrolled ? "border-emerald-200 text-emerald-600 hover:bg-emerald-50 hover:border-emerald-300" : "border-white/50 text-white hover:bg-white hover:text-[#4F46E5]"}`}
-                        >
-                            Join as Developer
-                        </Link>
                     </div>
 
                     {/* Mobile toggle */}
@@ -151,12 +151,15 @@ const Navbar = () => {
             >
                 <div className="bg-white/95 backdrop-blur-2xl border-t border-gray-100 shadow-lg mx-4 mb-3 rounded-2xl">
                     <div className="px-4 py-4 space-y-1">
-                        <Link href="/explore" onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:text-[#4F46E5] hover:bg-indigo-50/60 transition-all ${inter.className}`}>
+                        <Link href="/" onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${inter.className} ${isActive("/") ? "text-[#4F46E5] bg-indigo-50" : "text-gray-700 hover:text-[#4F46E5] hover:bg-indigo-50/60"}`}>
+                            Home
+                        </Link>
+                        <Link href="/explore" onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${inter.className} ${isActive("/explore") ? "text-[#4F46E5] bg-indigo-50" : "text-gray-700 hover:text-[#4F46E5] hover:bg-indigo-50/60"}`}>
                             Explore Campaigns
                         </Link>
                         {user ? (
                             <>
-                                <Link href={dashboardHref} onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:text-[#4F46E5] hover:bg-indigo-50/60 transition-all ${inter.className}`}>
+                                <Link href={dashboardHref} onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${inter.className} ${isActive(dashboardHref) ? "text-[#4F46E5] bg-indigo-50" : "text-gray-700 hover:text-[#4F46E5] hover:bg-indigo-50/60"}`}>
                                     Dashboard
                                 </Link>
                                 <div className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 ${inter.className}`}>
@@ -176,26 +179,19 @@ const Navbar = () => {
                             </>
                         ) : (
                             <>
-                                <Link href="/login" onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:text-[#4F46E5] hover:bg-indigo-50/60 transition-all ${inter.className}`}>
+                                <Link href="/login" onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${inter.className} ${isActive("/login") ? "text-[#4F46E5] bg-indigo-50" : "text-gray-700 hover:text-[#4F46E5] hover:bg-indigo-50/60"}`}>
                                     Login
                                 </Link>
-                                <Link href="/register" onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-center transition-all ${inter.className}`}>
+                                <Link href="/register" onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-semibold transition-all text-white bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-center ${inter.className}`}>
                                     Register
                                 </Link>
-                            </>
-                        )}
-                        <Link
-                            href="/register"
-                            onClick={() => setOpen(false)}
-                            className={`block px-4 py-2.5 rounded-xl text-sm font-semibold text-emerald-600 border border-emerald-200 text-center hover:bg-emerald-50 transition-all ${inter.className}`}
-                        >
-                            Join as Developer
-                        </Link>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
-        </nav>
-    );
-};
+            </nav>
+        );
+    };
 
 export default Navbar;
