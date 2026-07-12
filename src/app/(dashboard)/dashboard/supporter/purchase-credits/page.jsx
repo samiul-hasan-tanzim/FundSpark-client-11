@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import { useSession } from "@/lib/auth-client";
 import { useSearchParams } from "next/navigation";
 import { Poppins, Inter } from "next/font/google";
@@ -28,8 +28,12 @@ function PurchaseCreditsContent() {
     const [selected, setSelected] = useState(packages[1]);
     const [processing, setProcessing] = useState(false);
     const [alert, setAlert] = useState(null);
+    const processed = useRef(false);
 
     useEffect(() => {
+        if (processed.current) return;
+        processed.current = true;
+
         const success = searchParams.get('success');
         const credits = searchParams.get('credits');
         const cancelled = searchParams.get('cancelled');
@@ -48,7 +52,7 @@ function PurchaseCreditsContent() {
 
         const cleanUrl = window.location.pathname;
         window.history.replaceState({}, '', cleanUrl);
-    }, [searchParams]);
+    }, []);
 
     const handlePurchase = async () => {
         if (!session?.user?.email || processing) return;
