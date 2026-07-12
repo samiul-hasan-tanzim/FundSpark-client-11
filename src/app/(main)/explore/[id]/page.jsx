@@ -37,7 +37,24 @@ export default function CampaignDetailsPage() {
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState(null);
 
-    const expired = campaign?.deadline ? new Date(campaign.deadline) < new Date() : false;
+    const [now, setNow] = useState(Date.now());
+    useEffect(() => {
+        const t = setInterval(() => setNow(Date.now()), 1000);
+        return () => clearInterval(t);
+    }, []);
+
+    const campaignDeadline = campaign?.deadline ? new Date(campaign.deadline) : null;
+    const expired = campaignDeadline && campaignDeadline < now;
+
+    const timeAgo = (date) => {
+        const diff = now - date.getTime();
+        const mins = Math.floor(diff / 60000);
+        if (mins < 60) return `${mins}m ago`;
+        const hrs = Math.floor(mins / 60);
+        if (hrs < 24) return `${hrs}h ago`;
+        const days = Math.floor(hrs / 24);
+        return `${days}d ago`;
+    };
 
     const [contributionAmount, setContributionAmount] = useState("");
     const [contributing, setContributing] = useState(false);
@@ -291,7 +308,7 @@ export default function CampaignDetailsPage() {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                     </div>
-                                    <p className={`text-gray-500 font-semibold ${poppins.className}`}>Campaign Expired</p>
+                                    <p className={`text-gray-500 font-semibold ${poppins.className}`}>Campaign Ended {campaignDeadline && timeAgo(campaignDeadline)}</p>
                                     <p className={`text-sm text-gray-400 mt-1 ${inter.className}`}>This campaign is no longer accepting contributions.</p>
                                 </div>
                             ) : session ? (
@@ -342,6 +359,25 @@ export default function CampaignDetailsPage() {
                                         >
                                             {contributing ? "Processing..." : "Contribute Now"}
                                         </button>
+
+                                        {!expired && campaignDeadline && (() => {
+                                            const diff = campaignDeadline - now;
+                                            if (diff <= 0) return null;
+                                            const d = Math.floor(diff / 86400000);
+                                            const h = Math.floor((diff % 86400000) / 3600000);
+                                            const m = Math.floor((diff % 3600000) / 60000);
+                                            const s = Math.floor((diff % 60000) / 1000);
+                                            return (
+                                                <div className="mt-4 flex items-center justify-center gap-3 text-sm">
+                                                    {[{ v: d, l: 'Days' }, { v: h, l: 'Hrs' }, { v: m, l: 'Mins' }, { v: s, l: 'Secs' }].map(({ v, l }) => (
+                                                        <div key={l} className="text-center">
+                                                            <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-sm font-bold text-gray-900">{String(v).padStart(2, '0')}</div>
+                                                            <span className={`text-[10px] text-gray-400 mt-0.5 block ${inter.className}`}>{l}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            );
+                                        })()}
                                     </form>
                                 )
                             ) : (

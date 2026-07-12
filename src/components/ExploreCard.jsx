@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Poppins, Inter } from "next/font/google";
 
@@ -14,12 +15,27 @@ const categoryColors = {
     Environment: { bg: "bg-emerald-50", text: "text-emerald-600" },
 };
 
+function timeAgo(date) {
+    const diff = Date.now() - date.getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    return `${days}d ago`;
+}
+
 export default function ExploreCard({ campaign }) {
-    const now = new Date();
+    const [now, setNow] = useState(Date.now());
+    useEffect(() => {
+        const t = setInterval(() => setNow(Date.now()), 60000);
+        return () => clearInterval(t);
+    }, []);
+
     const deadline = campaign.deadline ? new Date(campaign.deadline) : null;
     const expired = deadline && deadline < now;
-    const daysLeft = deadline
-        ? Math.max(0, Math.ceil((deadline - now) / (1000 * 60 * 60 * 24)))
+    const daysLeft = deadline && !expired
+        ? Math.ceil((deadline - now) / (1000 * 60 * 60 * 24))
         : null;
     const progress = Math.min(100, ((campaign.raisedAmount || 0) / (campaign.fundingGoal || 1)) * 100);
     const colors = categoryColors[campaign.category] || { bg: "bg-gray-50", text: "text-gray-600" };
@@ -42,7 +58,7 @@ export default function ExploreCard({ campaign }) {
                     {campaign.category || "General"}
                 </span>
                 {expired ? (
-                    <span className="absolute top-3 right-3 px-3 py-1 bg-gray-500 text-white text-xs font-semibold rounded-full shadow-sm">Expired</span>
+                    <span className="absolute top-3 right-3 px-3 py-1 bg-gray-500 text-white text-xs font-semibold rounded-full shadow-sm">Ended {timeAgo(deadline)}</span>
                 ) : daysLeft !== null && daysLeft <= 7 && (
                     <span className="absolute top-3 right-3 px-3 py-1 bg-red-500 text-white text-xs font-semibold rounded-full shadow-sm">
                         {daysLeft === 0 ? "Ending" : `${daysLeft}d left`}

@@ -66,6 +66,7 @@ export default function MyCampaigns() {
                                     <th className="text-right px-6 py-3 font-medium">Goal</th>
                                     <th className="text-right px-6 py-3 font-medium">Status</th>
                                     <th className="text-right px-6 py-3 font-medium">Date</th>
+                                    <th className="text-right px-6 py-3 font-medium">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
@@ -93,6 +94,11 @@ export default function MyCampaigns() {
                                             </td>
                                             <td className={`px-6 py-4 text-sm text-gray-500 text-right ${inter.className}`}>
                                                 {new Date(c.createdAt).toLocaleDateString()}
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <Link href={`/dashboard/creator/edit-campaign/${c._id}`} className="inline-flex px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-all">
+                                                    Edit
+                                                </Link>
                                             </td>
                                         </tr>
                                     );
