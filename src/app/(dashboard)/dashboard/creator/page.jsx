@@ -12,6 +12,7 @@ export default function CreatorDashboard() {
     const [stats, setStats] = useState({ totalCampaigns: 0, activeCampaigns: 0, totalRaised: 0, pendingContributions: 0 });
     const [contributions, setContributions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [processingId, setProcessingId] = useState(null);
 
     useEffect(() => {
         if (!session?.user?.email) return;
@@ -33,6 +34,23 @@ export default function CreatorDashboard() {
             setLoading(false);
         });
     }, [session]);
+
+    const handleContributionStatus = async (id, status) => {
+        setProcessingId(id);
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/contributions/status`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.user.email}` },
+                body: JSON.stringify({ contributionId: id, status }),
+            });
+            if (res.ok) {
+                setContributions(prev => prev.filter(c => c._id !== id));
+                setStats(prev => ({ ...prev, pendingContributions: prev.pendingContributions - 1 }));
+            }
+        } finally {
+            setProcessingId(null);
+        }
+    };
 
     const statCards = [
         { label: "Total Campaigns", value: stats.totalCampaigns, icon: "M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10", color: "from-[#4F46E5] to-[#7C3AED]" },
@@ -117,8 +135,8 @@ export default function CreatorDashboard() {
                                         <td className={`px-6 py-4 text-sm font-semibold text-gray-900 text-right ${inter.className}`}>{c.contributionAmount} credits</td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
-                                                <button className="px-4 py-1.5 bg-emerald-50 text-emerald-600 text-xs font-semibold rounded-full hover:bg-emerald-100 transition-colors">Approve</button>
-                                                <button className="px-4 py-1.5 bg-red-50 text-red-600 text-xs font-semibold rounded-full hover:bg-red-100 transition-colors">Reject</button>
+                                                <button onClick={() => handleContributionStatus(c._id, 'approved')} disabled={processingId === c._id} className="px-4 py-1.5 bg-emerald-50 text-emerald-600 text-xs font-semibold rounded-full hover:bg-emerald-100 disabled:opacity-50 transition-colors">Approve</button>
+                                                <button onClick={() => handleContributionStatus(c._id, 'rejected')} disabled={processingId === c._id} className="px-4 py-1.5 bg-red-50 text-red-600 text-xs font-semibold rounded-full hover:bg-red-100 disabled:opacity-50 transition-colors">Reject</button>
                                             </div>
                                         </td>
                                     </tr>
