@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSession } from "@/lib/auth-client";
+import { useSearchParams } from "next/navigation";
 import { Poppins, Inter } from "next/font/google";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700", "800"] });
@@ -14,9 +15,40 @@ const packages = [
 ];
 
 export default function PurchaseCredits() {
+    return (
+        <Suspense fallback={<div className="p-6 text-center text-gray-500">Loading...</div>}>
+            <PurchaseCreditsContent />
+        </Suspense>
+    );
+}
+
+function PurchaseCreditsContent() {
     const { data: session } = useSession();
+    const searchParams = useSearchParams();
     const [selected, setSelected] = useState(packages[1]);
     const [processing, setProcessing] = useState(false);
+    const [alert, setAlert] = useState(null);
+
+    useEffect(() => {
+        const success = searchParams.get('success');
+        const credits = searchParams.get('credits');
+        const cancelled = searchParams.get('cancelled');
+        const error = searchParams.get('error');
+
+        if (success === 'true' && credits) {
+            setAlert({ type: 'success', message: `Payment successful! ${credits} credits have been added to your account.` });
+        } else if (cancelled === 'true') {
+            setAlert({ type: 'info', message: 'Payment was cancelled. No charges were made.' });
+        } else if (error) {
+            const msg = error === 'missing_session' ? 'Invalid payment session.' :
+                        error === 'not_paid' ? 'Payment was not completed.' :
+                        'Something went wrong. Please try again.';
+            setAlert({ type: 'error', message: msg });
+        }
+
+        const cleanUrl = window.location.pathname;
+        window.history.replaceState({}, '', cleanUrl);
+    }, [searchParams]);
 
     const handlePurchase = async () => {
         if (!session?.user?.email || processing) return;
@@ -42,6 +74,20 @@ export default function PurchaseCredits() {
                 <h1 className={`text-2xl lg:text-3xl font-bold text-gray-900 ${poppins.className}`}>Purchase Credits</h1>
                 <p className={`text-sm text-gray-500 mt-1 ${inter.className}`}>Buy credits to support your favorite campaigns.</p>
             </div>
+
+            {alert && (
+                <div className={`p-4 rounded-2xl border flex items-start gap-3 ${alert.type === 'success' ? 'bg-emerald-50 border-emerald-200' : alert.type === 'error' ? 'bg-red-50 border-red-200' : 'bg-sky-50 border-sky-200'}`}>
+                    <svg className={`w-5 h-5 mt-0.5 shrink-0 ${alert.type === 'success' ? 'text-emerald-500' : alert.type === 'error' ? 'text-red-500' : 'text-sky-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={alert.type === 'success' ? 'M5 13l4 4L19 7' : alert.type === 'error' ? 'M6 18L18 6M6 6l12 12' : 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'} />
+                    </svg>
+                    <p className={`text-sm ${alert.type === 'success' ? 'text-emerald-700' : alert.type === 'error' ? 'text-red-700' : 'text-sky-700'} ${inter.className}`}>{alert.message}</p>
+                    <button onClick={() => setAlert(null)} className="ml-auto p-1 text-gray-400 hover:text-gray-600">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
                 {packages.map((pkg) => (
