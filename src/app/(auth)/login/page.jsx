@@ -65,7 +65,8 @@ const LoginPage = () => {
             toast.success("Welcome back!");
             await initializeCredits(data.user.email);
             const role = data?.user?.role || "supporter";
-            window.location.href = role === "creator" ? "/dashboard/creator" : "/dashboard/supporter";
+            const dashboardMap = { admin: "/dashboard/admin", creator: "/dashboard/creator", supporter: "/dashboard/supporter" };
+            window.location.href = dashboardMap[role] || "/dashboard/supporter";
         } else {
             setLoading(false);
         }

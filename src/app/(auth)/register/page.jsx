@@ -110,7 +110,8 @@ const SignUpPage = () => {
             } else if (data?.token && data?.user?.email) {
                 toast.success("Account created successfully!");
                 await initializeCredits(data.user.email);
-                window.location.href = role === "creator" ? "/dashboard/creator" : "/dashboard/supporter";
+                const dashboardMap = { admin: "/dashboard/admin", creator: "/dashboard/creator", supporter: "/dashboard/supporter" };
+                window.location.href = dashboardMap[role] || "/dashboard/supporter";
             }
         } else {
             setErrors(prev => ({ ...prev, confirmPassword: "Passwords do not match" }));

@@ -89,7 +89,7 @@ export default function ManageUsers() {
                                         <td className="px-6 py-4">
                                             <select
                                                 value={u.role}
-                                                disabled={u.email === 'admin@admin.com'}
+                                                disabled={u.email === session?.user?.email}
                                                 onChange={(e) => handleRoleChange(u.email, e.target.value)}
                                                 className={`px-3 py-1.5 text-xs font-medium rounded-xl border border-gray-200 outline-none focus:border-[#4F46E5] focus:ring-2 focus:ring-[#4F46E5]/10 disabled:opacity-50 disabled:cursor-not-allowed ${inter.className}`}
                                             >
@@ -101,10 +101,10 @@ export default function ManageUsers() {
                                         <td className={`px-6 py-4 text-sm font-semibold text-gray-900 text-right ${inter.className}`}>{u.credits}</td>
                                         <td className="px-6 py-4 text-right">
                                             <button
-                                                disabled={u.email === 'admin@admin.com'}
+                                                disabled={u.email === session?.user?.email}
                                                 onClick={() => handleRemove(u.email)}
                                                 className={`px-3 py-1.5 text-xs font-medium rounded-xl transition-all ${
-                                                    u.email === 'admin@admin.com'
+                                                    u.email === session?.user?.email
                                                         ? 'text-gray-300 bg-gray-50 cursor-not-allowed'
                                                         : 'text-red-600 bg-red-50 hover:bg-red-100'
                                                 }`}
