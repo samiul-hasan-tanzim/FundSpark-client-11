@@ -42,7 +42,7 @@ export default function TopCampaigns({ campaigns }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     {campaigns.length === 0 ? (
                         Array.from({ length: 3 }).map((_, i) => (
-                            <div key={i} className="bg-white rounded-[24px] overflow-hidden border border-slate-200/60 animate-pulse flex flex-col">
+                            <div key={i} className="bg-white rounded-3xl overflow-hidden border border-slate-200/60 animate-pulse flex flex-col">
                                 <div className="h-64 bg-slate-200" />
                                 <div className="p-6 space-y-4">
                                     <div className="h-3 bg-slate-200 rounded w-1/3" />
@@ -60,7 +60,7 @@ export default function TopCampaigns({ campaigns }) {
                         campaigns.slice(0, 3).map((campaign, i) => {
                             const pct = raisedPercent(campaign);
                             return (
-                                <div key={i} className="bg-white rounded-[24px] overflow-hidden border border-slate-200/60 hover:shadow-2xl transition-all group flex flex-col">
+                                <div key={i} className="bg-white rounded-3xl overflow-hidden border border-slate-200/60 hover:shadow-2xl transition-all group flex flex-col">
                                     <div className="relative overflow-hidden h-64">
                                         <img className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={campaign.title} src={campaign.image || "/placeholder.jpg"} />
                                         <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-indigo-700 flex items-center gap-1">
@@ -82,7 +82,7 @@ export default function TopCampaigns({ campaigns }) {
                                         </div>
                                         <div className="mt-auto space-y-3">
                                             <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                                                <div className="h-full bg-gradient-to-r from-emerald-500 to-sky-500" style={{ width: `${pct}%` }}></div>
+                                                <div className="h-full bg-linear-to-r from-emerald-500 to-sky-500" style={{ width: `${pct}%` }}></div>
                                             </div>
                                             <div className="flex justify-between items-center font-semibold">
                                                 <div className="space-y-1">

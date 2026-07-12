@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Heart } from "lucide-react";
 
 const categoryBadge = {
@@ -37,7 +38,7 @@ export default function ExploreCard({ campaign }) {
         <Link href={`/explore/${campaign._id}`} className="group block bg-white rounded-lg border border-slate-200/30 overflow-hidden flex flex-col h-full hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(53,37,205,0.08)] transition-all duration-300">
             <div className="relative h-48 overflow-hidden">
                 {campaign.image ? (
-                    <img src={campaign.image} alt={campaign.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <Image src={campaign.image} alt={campaign.title} fill className="object-cover transition-transform duration-500 group-hover:scale-110" unoptimized />
                 ) : (
                     <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
                         <svg className="w-14 h-14 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
