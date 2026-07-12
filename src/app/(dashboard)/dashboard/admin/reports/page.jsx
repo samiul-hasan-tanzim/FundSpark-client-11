@@ -15,7 +15,7 @@ export default function Reports() {
     const fetchReports = () => {
         if (!session?.user?.email) return;
         fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/reports`, {
-            headers: { Authorization: `Bearer ${session.user.email}` },
+            cache: 'no-store', headers: { Authorization: `Bearer ${session.user.email}` },
         }).then(r => r.json()).then(data => { setReports(data || []); setLoading(false); }).catch(() => setLoading(false));
     };
 

@@ -24,7 +24,7 @@ export default function WithdrawalRequests() {
             ? `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/withdrawals/pending`
             : `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/withdrawals/all`;
         fetch(endpoint, {
-            headers: { Authorization: `Bearer ${session.user.email}` },
+            cache: 'no-store', headers: { Authorization: `Bearer ${session.user.email}` },
         }).then(r => r.json()).then(data => { setWithdrawals(data || []); setLoading(false); }).catch(() => setLoading(false));
     };
 

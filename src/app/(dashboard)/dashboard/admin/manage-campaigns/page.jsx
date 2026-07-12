@@ -14,14 +14,14 @@ export default function ManageCampaigns() {
     const fetchCampaigns = () => {
         if (!session?.user?.email) return;
         fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/campaigns/all`, {
-            headers: { Authorization: `Bearer ${session.user.email}` },
+            cache: 'no-store', headers: { Authorization: `Bearer ${session.user.email}` },
         }).then(r => r.json()).then(data => { setCampaigns(data || []); }).catch(() => {});
     };
 
     useEffect(() => {
         if (!session?.user?.email) return;
         fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/campaigns/all`, {
-            headers: { Authorization: `Bearer ${session.user.email}` },
+            cache: 'no-store', headers: { Authorization: `Bearer ${session.user.email}` },
         }).then(r => r.json()).then(data => { setCampaigns(data || []); setLoading(false); }).catch(() => setLoading(false));
     }, [session]);
 

@@ -14,7 +14,7 @@ export default function AdminDashboard() {
     useEffect(() => {
         if (!session?.user?.email) return;
         fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/stats`, {
-            headers: { Authorization: `Bearer ${session.user.email}` },
+            cache: 'no-store', headers: { Authorization: `Bearer ${session.user.email}` },
         }).then(r => r.json()).then(data => { setStats(data); setLoading(false); }).catch(() => setLoading(false));
     }, [session]);
 

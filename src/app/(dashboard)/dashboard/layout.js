@@ -9,7 +9,7 @@ export default function DashboardLayout({ children }) {
 
     useEffect(() => {
         if (session?.user?.email) {
-            fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/profile`, {
+            fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/profile`, { cache: 'no-store',
                 headers: { Authorization: `Bearer ${session.user.email}` },
             }).then(r => r.json()).then(setProfile).catch(() => {});
         }

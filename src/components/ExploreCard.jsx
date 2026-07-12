@@ -15,8 +15,11 @@ const categoryColors = {
 };
 
 export default function ExploreCard({ campaign }) {
-    const daysLeft = campaign.deadline
-        ? Math.max(0, Math.ceil((new Date(campaign.deadline) - new Date()) / (1000 * 60 * 60 * 24)))
+    const now = new Date();
+    const deadline = campaign.deadline ? new Date(campaign.deadline) : null;
+    const expired = deadline && deadline < now;
+    const daysLeft = deadline
+        ? Math.max(0, Math.ceil((deadline - now) / (1000 * 60 * 60 * 24)))
         : null;
     const progress = Math.min(100, ((campaign.raisedAmount || 0) / (campaign.fundingGoal || 1)) * 100);
     const colors = categoryColors[campaign.category] || { bg: "bg-gray-50", text: "text-gray-600" };
@@ -38,7 +41,9 @@ export default function ExploreCard({ campaign }) {
                 <span className={`absolute top-3 left-3 px-3 py-1 ${colors.bg} ${colors.text} text-xs font-semibold rounded-full shadow-sm`}>
                     {campaign.category || "General"}
                 </span>
-                {daysLeft !== null && daysLeft <= 7 && (
+                {expired ? (
+                    <span className="absolute top-3 right-3 px-3 py-1 bg-gray-500 text-white text-xs font-semibold rounded-full shadow-sm">Expired</span>
+                ) : daysLeft !== null && daysLeft <= 7 && (
                     <span className="absolute top-3 right-3 px-3 py-1 bg-red-500 text-white text-xs font-semibold rounded-full shadow-sm">
                         {daysLeft === 0 ? "Ending" : `${daysLeft}d left`}
                     </span>

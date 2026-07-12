@@ -37,6 +37,8 @@ export default function CampaignDetailsPage() {
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState(null);
 
+    const expired = campaign?.deadline ? new Date(campaign.deadline) < new Date() : false;
+
     const [contributionAmount, setContributionAmount] = useState("");
     const [contributing, setContributing] = useState(false);
     const [contributeError, setContributeError] = useState("");
@@ -50,7 +52,7 @@ export default function CampaignDetailsPage() {
 
     useEffect(() => {
         if (!params.id) return;
-        fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/campaigns/${params.id}`)
+        fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/campaigns/${params.id}`, { cache: 'no-store' })
             .then(r => r.json())
             .then(data => { setCampaign(data); setLoading(false); })
             .catch(() => setLoading(false));
@@ -59,7 +61,7 @@ export default function CampaignDetailsPage() {
     useEffect(() => {
         if (!session?.user?.email) return;
         fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/profile`, {
-            headers: { Authorization: `Bearer ${session.user.email}` }
+            cache: 'no-store', headers: { Authorization: `Bearer ${session.user.email}` }
         })
             .then(r => r.json())
             .then(data => setProfile(data))
@@ -100,7 +102,7 @@ export default function CampaignDetailsPage() {
                 setContributeSuccess(true);
                 setContributionAmount("");
                 setProfile(prev => prev ? { ...prev, credits: prev.credits - amount } : prev);
-                fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/campaigns/${params.id}`)
+                fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/campaigns/${params.id}`, { cache: 'no-store' })
                     .then(r => r.json())
                     .then(data => { if (data) setCampaign(data); })
                     .catch(() => {});
@@ -282,7 +284,17 @@ export default function CampaignDetailsPage() {
                                 </div>
                             </div>
 
-                            {session ? (
+                            {expired ? (
+                                <div className="text-center py-8">
+                                    <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                                        <svg className="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <p className={`text-gray-500 font-semibold ${poppins.className}`}>Campaign Expired</p>
+                                    <p className={`text-sm text-gray-400 mt-1 ${inter.className}`}>This campaign is no longer accepting contributions.</p>
+                                </div>
+                            ) : session ? (
                                 contributeSuccess ? (
                                     <div className="text-center py-6">
                                         <div className="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
@@ -295,7 +307,6 @@ export default function CampaignDetailsPage() {
                                     </div>
                                 ) : (
                                     <form onSubmit={handleContribute}>
-                                        {/* Available credits */}
                                         <div className="flex items-center justify-between mb-4 p-3 bg-indigo-50 rounded-xl">
                                             <span className={`text-sm text-gray-600 ${inter.className}`}>Available Credits</span>
                                             <span className={`text-lg font-bold text-[#4F46E5] ${poppins.className}`}>
@@ -303,7 +314,6 @@ export default function CampaignDetailsPage() {
                                             </span>
                                         </div>
 
-                                        {/* Contribution input */}
                                         <div className="mb-4">
                                             <label className={`block text-sm font-medium text-gray-700 mb-1.5 ${inter.className}`}>
                                                 Contribution Amount

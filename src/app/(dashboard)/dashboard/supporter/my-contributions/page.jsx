@@ -16,7 +16,7 @@ export default function MyContributions() {
     useEffect(() => {
         if (!session?.user?.email) return;
         fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/contributions/my?page=${page}&limit=10`, {
-            headers: { Authorization: `Bearer ${session.user.email}` },
+            cache: 'no-store', headers: { Authorization: `Bearer ${session.user.email}` },
         }).then(r => r.json()).then((data) => {
             setContributions(data.contributions || []);
             setTotalPages(data.totalPages || 1);

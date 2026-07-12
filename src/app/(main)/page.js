@@ -13,9 +13,9 @@ export default function Home() {
     const [stats, setStats] = useState({ totalCampaigns: 0, totalCreators: 0, totalSupporters: 0, totalCredits: 0 });
 
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/campaigns/top`)
+        fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/campaigns/top`, { cache: 'no-store' })
             .then(r => r.json()).then(setCampaigns).catch(() => { });
-        fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/stats`)
+        fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/stats`, { cache: 'no-store' })
             .then(r => r.json()).then(setStats).catch(() => { });
     }, []);
 

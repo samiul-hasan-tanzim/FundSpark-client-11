@@ -25,7 +25,7 @@ export default function Withdrawals() {
     useEffect(() => {
         if (!session?.user?.email) return;
         fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/withdrawals/my`, {
-            headers: { Authorization: `Bearer ${session.user.email}` },
+            cache: 'no-store', headers: { Authorization: `Bearer ${session.user.email}` },
         }).then(r => r.json()).then(data => {
             setWithdrawals(data.withdrawals || []);
             setTotalRaised(data.totalRaised || 0);

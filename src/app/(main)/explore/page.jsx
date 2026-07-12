@@ -15,7 +15,7 @@ export default function ExplorePage() {
     const [sort, setSort] = useState("newest");
 
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/campaigns`)
+        fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/campaigns`, { cache: 'no-store' })
             .then(r => r.json())
             .then(data => { setCampaigns(data); setLoading(false); })
             .catch(() => setLoading(false));

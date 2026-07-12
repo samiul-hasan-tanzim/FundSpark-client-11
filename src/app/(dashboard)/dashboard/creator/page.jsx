@@ -18,10 +18,10 @@ export default function CreatorDashboard() {
         if (!session?.user?.email) return;
         Promise.all([
             fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/creator/stats`, {
-                headers: { Authorization: `Bearer ${session.user.email}` },
+                cache: 'no-store', headers: { Authorization: `Bearer ${session.user.email}` },
             }).then(r => r.json()).catch(() => ({})),
             fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/contributions/pending`, {
-                headers: { Authorization: `Bearer ${session.user.email}` },
+                cache: 'no-store', headers: { Authorization: `Bearer ${session.user.email}` },
             }).then(r => r.json()).catch(() => []),
         ]).then(([statsData, contribs]) => {
             setStats({
