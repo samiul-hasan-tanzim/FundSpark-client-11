@@ -10,10 +10,10 @@ const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
 export default function Testimonials() {
     return (
         <section className="py-20 bg-white">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto px-5">
                 <div className="text-center mb-12">
-                    <h2 className={`text-3xl md:text-4xl font-bold text-gray-900 ${poppins.className}`}>What Our Users Say</h2>
-                    <p className={`mt-3 text-gray-500 max-w-lg mx-auto ${inter.className}`}>Hear from the FundSpark community</p>
+                    <h2 className={`text-3xl md:text-4xl font-bold text-slate-900 ${poppins.className}`}>What Our Users Say</h2>
+                    <p className={`mt-3 text-slate-500 max-w-lg mx-auto ${inter.className}`}>Hear from the FundSpark community</p>
                 </div>
                 <Swiper
                     modules={[Autoplay]}
@@ -25,7 +25,7 @@ export default function Testimonials() {
                 >
                     {testimonials.map((t, i) => (
                         <SwiperSlide key={i}>
-                            <div className="bg-[#F8FAFC] rounded-[24px] p-8 h-full hover:shadow-lg transition-shadow duration-300">
+                            <div className="bg-[#F8FAFC] border border-slate-100 rounded-2xl p-8 h-full hover:shadow-lg transition-shadow duration-300">
                                 <div className="flex items-center gap-1 mb-4">
                                     {Array.from({ length: 5 }).map((_, j) => (
                                         <svg key={j} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
@@ -33,14 +33,14 @@ export default function Testimonials() {
                                         </svg>
                                     ))}
                                 </div>
-                                <p className={`text-sm text-gray-600 leading-relaxed mb-6 ${inter.className}`}>&ldquo;{t.text}&rdquo;</p>
+                                <p className={`text-sm text-slate-600 leading-relaxed mb-6 ${inter.className}`}>&ldquo;{t.text}&rdquo;</p>
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] flex items-center justify-center text-white text-sm font-medium">
                                         {t.name.split(" ").map(n => n[0]).join("")}
                                     </div>
                                     <div>
-                                        <p className={`text-sm font-semibold text-gray-900 ${inter.className}`}>{t.name}</p>
-                                        <p className={`text-xs text-gray-500 ${inter.className}`}>{t.role}</p>
+                                        <p className={`text-sm font-semibold text-slate-900 ${inter.className}`}>{t.name}</p>
+                                        <p className={`text-xs text-slate-500 ${inter.className}`}>{t.role}</p>
                                     </div>
                                 </div>
                             </div>

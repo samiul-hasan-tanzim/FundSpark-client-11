@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import ExploreFilters from "@/components/ExploreFilters";
 import ExploreCard, { ExploreCardSkeleton } from "@/components/ExploreCard";
+import FadeIn from "@/components/FadeIn";
 
 const PER_PAGE = 9;
 
@@ -114,43 +115,46 @@ export default function ExplorePage() {
     return (
         <div>
             {/* Hero Search Section */}
-            <section className="mb-16 pt-24">
-                <div className="max-w-7xl mx-auto px-5">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                        <div className="flex-1 max-w-2xl">
-                            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-2">Discover Innovation</h1>
-                            <p className="text-lg text-slate-500 mb-6">Support the creators building the future of technology, community, and health.</p>
-                            <div className="relative group">
-                                <Search size={20} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-700 transition-colors" />
-                                <input
-                                    type="text"
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    placeholder="Search projects, creators, or categories..."
-                                    className="w-full pl-14 pr-6 py-4 bg-white border-none rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-200 transition-all text-base placeholder:text-slate-400"
-                                />
+            <FadeIn>
+                <section className="mb-16 pt-24">
+                    <div className="max-w-7xl mx-auto px-5">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                            <div className="flex-1 max-w-2xl">
+                                <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-2">Discover Innovation</h1>
+                                <p className="text-lg text-slate-500 mb-6">Support the creators building the future of technology, community, and health.</p>
+                                <div className="relative group">
+                                    <Search size={20} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-700 transition-colors" />
+                                    <input
+                                        type="text"
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        placeholder="Search projects, creators, or categories..."
+                                        className="w-full pl-14 pr-6 py-4 bg-white border-none rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-200 transition-all text-base placeholder:text-slate-400"
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <span className="text-sm font-semibold text-slate-500 whitespace-nowrap">Sort by:</span>
+                                <select
+                                    value={sort}
+                                    onChange={(e) => setSort(e.target.value)}
+                                    className="bg-white border-none rounded-lg shadow-sm px-4 py-3 focus:ring-2 focus:ring-indigo-200 cursor-pointer text-sm font-semibold text-slate-700"
+                                >
+                                    <option value="most_funded">Most Funded</option>
+                                    <option value="newest">Recently Added</option>
+                                    <option value="ending_soon">Ending Soon</option>
+                                    <option value="smallest_goals">Smallest Goals</option>
+                                </select>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <span className="text-sm font-semibold text-slate-500 whitespace-nowrap">Sort by:</span>
-                            <select
-                                value={sort}
-                                onChange={(e) => setSort(e.target.value)}
-                                className="bg-white border-none rounded-lg shadow-sm px-4 py-3 focus:ring-2 focus:ring-indigo-200 cursor-pointer text-sm font-semibold text-slate-700"
-                            >
-                                <option value="most_funded">Most Funded</option>
-                                <option value="newest">Recently Added</option>
-                                <option value="ending_soon">Ending Soon</option>
-                                <option value="smallest_goals">Smallest Goals</option>
-                            </select>
-                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </FadeIn>
 
             {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-5">
-                <div className="flex flex-col md:flex-row gap-10">
+            <FadeIn delay={0.1}>
+                <div className="max-w-7xl mx-auto px-5">
+                    <div className="flex flex-col md:flex-row gap-10">
                     {/* Sidebar Filters */}
                     <ExploreFilters
                         category={category}
@@ -204,6 +208,7 @@ export default function ExplorePage() {
                     </div>
                 </div>
             </div>
+            </FadeIn>
         </div>
     );
 }

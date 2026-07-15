@@ -4,6 +4,7 @@ import { useSession } from "@/lib/auth-client";
 import { Poppins, Inter } from "next/font/google";
 import Link from "next/link";
 import Image from "next/image";
+import toast from "react-hot-toast";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700"] });
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
@@ -18,8 +19,10 @@ export default function MyCampaigns() {
     const { data: session } = useSession();
     const [campaigns, setCampaigns] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [deleteTarget, setDeleteTarget] = useState(null);
+    const [deleting, setDeleting] = useState(false);
 
-    useEffect(() => {
+    const fetchCampaigns = () => {
         if (!session?.user?.email) return;
         fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/campaigns/my`, {
             cache: 'no-store', headers: { Authorization: `Bearer ${session.user.email}` },
@@ -27,7 +30,33 @@ export default function MyCampaigns() {
             setCampaigns(data || []);
             setLoading(false);
         }).catch(() => setLoading(false));
+    };
+
+    useEffect(() => {
+        fetchCampaigns();
     }, [session]);
+
+    const handleDelete = async () => {
+        if (!deleteTarget) return;
+        setDeleting(true);
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/campaigns/delete/${deleteTarget}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${session?.user?.email}` },
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                toast.error(data.message || "Failed to delete campaign");
+            } else {
+                toast.success(data.message || "Campaign deleted");
+                setDeleteTarget(null);
+                fetchCampaigns();
+            }
+        } catch {
+            toast.error("Network error");
+        }
+        setDeleting(false);
+    };
 
     return (
         <div className="space-y-6">
@@ -106,9 +135,14 @@ export default function MyCampaigns() {
                                                 {new Date(c.createdAt).toLocaleDateString()}
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                <Link href={`/dashboard/creator/edit-campaign/${c._id}`} className="inline-flex px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-all">
-                                                    Edit
-                                                </Link>
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Link href={`/dashboard/creator/edit-campaign/${c._id}`} className="inline-flex px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-all">
+                                                        Edit
+                                                    </Link>
+                                                    <button onClick={() => setDeleteTarget(c._id)} className="inline-flex px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-all">
+                                                        Delete
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     );
@@ -118,6 +152,39 @@ export default function MyCampaigns() {
                     </div>
                 )}
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {deleteTarget && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => !deleting && setDeleteTarget(null)}>
+                    <div className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl" onClick={e => e.stopPropagation()}>
+                        <div className="w-12 h-12 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
+                            <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                        </div>
+                        <h3 className={`text-lg font-bold text-gray-900 text-center mb-2 ${poppins.className}`}>Delete Campaign?</h3>
+                        <p className={`text-sm text-gray-500 text-center mb-6 ${inter.className}`}>
+                            This will permanently delete the campaign and refund all approved supporters. This action cannot be undone.
+                        </p>
+                        <div className="flex gap-3">
+                            <button onClick={() => setDeleteTarget(null)} disabled={deleting} className={`flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all disabled:opacity-50 ${inter.className}`}>
+                                Cancel
+                            </button>
+                            <button onClick={handleDelete} disabled={deleting} className={`flex-1 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl text-sm font-semibold shadow-sm hover:shadow-md transition-all disabled:opacity-60 flex items-center justify-center gap-2 ${inter.className}`}>
+                                {deleting ? (
+                                    <>
+                                        <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                        </svg>
+                                        Deleting...
+                                    </>
+                                ) : "Delete Campaign"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

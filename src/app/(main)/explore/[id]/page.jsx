@@ -13,6 +13,7 @@ import ContributionPanel from "@/components/ContributionPanel";
 import ShareActions from "@/components/ShareActions";
 import ReportModal from "@/components/ReportModal";
 import ContributionSuccessModal from "@/components/ContributionSuccessModal";
+import FadeIn from "@/components/FadeIn";
 
 function Skeleton() {
     return (
@@ -233,16 +234,16 @@ export default function CampaignDetailsPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Left Column */}
                     <div className="lg:col-span-2 flex flex-col gap-8">
-                        <CampaignHero campaign={campaign} />
-                        <CampaignStory campaign={campaign} />
-                        <RewardsSection campaign={campaign} />
-                        <CreatorCard campaign={campaign} creatorImage={creatorUser?.image} />
+                        <FadeIn><CampaignHero campaign={campaign} /></FadeIn>
+                        <FadeIn delay={0.1}><CampaignStory campaign={campaign} /></FadeIn>
+                        <FadeIn delay={0.2}><RewardsSection campaign={campaign} /></FadeIn>
+                        <FadeIn delay={0.3}><CreatorCard campaign={campaign} creatorImage={creatorUser?.image} /></FadeIn>
                     </div>
 
                     {/* Right Column */}
                     <div className="lg:col-span-1">
                         <div className="sticky top-28 flex flex-col gap-4">
-                            <ContributionPanel
+                            <FadeIn><ContributionPanel
                                 campaign={campaign}
                                 profile={profile}
                                 session={session}
@@ -259,7 +260,7 @@ export default function CampaignDetailsPage() {
                                 handleContribute={handleContribute}
                                 timeAgo={timeAgo}
                                 hasPendingContribution={hasPendingContribution}
-                            />
+                            /></FadeIn>
                             <ShareActions session={session} onReport={() => setShowReportModal(true)} />
                         </div>
                     </div>

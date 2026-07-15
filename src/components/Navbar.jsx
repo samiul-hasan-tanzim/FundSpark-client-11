@@ -66,10 +66,17 @@ const Navbar = () => {
                             Explore Campaigns
                         </Link>
 
-                        {user ? (
+                            {user ? (
                             <>
                                 <Link href={dashboardHref} className={`${linkBase} px-4 py-2 rounded-xl ${isActive(dashboardHref) ? "text-[#4F46E5] bg-indigo-50/80" : "text-gray-600 hover:text-[#4F46E5] hover:bg-indigo-50/60"}`}>
                                     Dashboard
+                                </Link>
+
+                                <Link
+                                    href="/register"
+                                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${inter.className} bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5`}
+                                >
+                                    Join as Developer
                                 </Link>
 
                                 <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100/60 rounded-full shadow-sm">
@@ -121,6 +128,12 @@ const Navbar = () => {
                                 >
                                     Register
                                 </Link>
+                                <Link
+                                    href="/register"
+                                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${inter.className} bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5`}
+                                >
+                                    Join as Developer
+                                </Link>
                             </>
                         )}
                     </div>
@@ -160,6 +173,9 @@ const Navbar = () => {
                                 <Link href={dashboardHref} onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${inter.className} ${isActive(dashboardHref) ? "text-[#4F46E5] bg-indigo-50" : "text-gray-700 hover:text-[#4F46E5] hover:bg-indigo-50/60"}`}>
                                     Dashboard
                                 </Link>
+                                <Link href="/register" onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-semibold text-center text-white bg-gradient-to-r from-emerald-500 to-emerald-600 ${inter.className}`}>
+                                    Join as Developer
+                                </Link>
                                 <div className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 ${inter.className}`}>
                                     <span>Available Credits</span>
                                     <span className="font-bold text-[#4F46E5]">{credits}</span>
@@ -182,6 +198,9 @@ const Navbar = () => {
                                 </Link>
                                 <Link href="/register" onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-semibold transition-all text-white bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-center ${inter.className}`}>
                                     Register
+                                </Link>
+                                <Link href="/register" onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-semibold text-center text-white bg-gradient-to-r from-emerald-500 to-emerald-600 ${inter.className}`}>
+                                    Join as Developer
                                 </Link>
                             </>
                         )}

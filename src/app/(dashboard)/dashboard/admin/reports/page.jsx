@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "@/lib/auth-client";
 import { Poppins, Inter } from "next/font/google";
+import toast from "react-hot-toast";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700"] });
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
@@ -11,6 +12,7 @@ export default function Reports() {
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
     const [expandedId, setExpandedId] = useState(null);
+    const [confirmAction, setConfirmAction] = useState(null);
 
     const fetchReports = () => {
         if (!session?.user?.email) return;
@@ -27,6 +29,37 @@ export default function Reports() {
             headers: { Authorization: `Bearer ${session.user.email}` },
         });
         setReports(prev => prev.filter(r => r._id !== id));
+        toast.success("Report dismissed");
+    };
+
+    const handleSuspend = async (r) => {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/campaigns/suspend`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.user.email}` },
+                body: JSON.stringify({ campaignId: r.campaignId }),
+            });
+            const data = await res.json();
+            if (!res.ok) { toast.error(data.message || "Failed to suspend"); return; }
+            toast.success(`"${r.campaignTitle}" suspended`);
+            setReports(prev => prev.filter(x => x._id !== r._id));
+        } catch { toast.error("Network error"); }
+        setConfirmAction(null);
+    };
+
+    const handleDeleteCampaign = async (r) => {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/campaigns/delete`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.user.email}` },
+                body: JSON.stringify({ campaignId: r.campaignId }),
+            });
+            const data = await res.json();
+            if (!res.ok) { toast.error(data.message || "Failed to delete"); return; }
+            toast.success(`"${r.campaignTitle}" deleted and supporters refunded`);
+            setReports(prev => prev.filter(x => x._id !== r._id));
+        } catch { toast.error("Network error"); }
+        setConfirmAction(null);
     };
 
     return (
@@ -62,12 +95,17 @@ export default function Reports() {
                                             Reported by {r.reporterName || r.reporterEmail} &middot; {new Date(r.createdAt).toLocaleDateString()}
                                         </p>
                                     </div>
-                                    <button
-                                        onClick={() => handleRemove(r._id)}
-                                        className="px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-all shrink-0"
-                                    >
-                                        Dismiss
-                                    </button>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                        <button onClick={() => setConfirmAction({ type: "suspend", report: r })} className="px-3 py-1.5 text-xs font-medium text-amber-600 bg-amber-50 rounded-xl hover:bg-amber-100 transition-all">
+                                            Suspend
+                                        </button>
+                                        <button onClick={() => setConfirmAction({ type: "delete", report: r })} className="px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-all">
+                                            Delete
+                                        </button>
+                                        <button onClick={() => handleRemove(r._id)} className="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all">
+                                            Dismiss
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="mt-2">
                                     <button
@@ -85,6 +123,43 @@ export default function Reports() {
                     </div>
                 )}
             </div>
+
+            {/* Confirmation Modal */}
+            {confirmAction && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setConfirmAction(null)}>
+                    <div className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl" onClick={e => e.stopPropagation()}>
+                        <div className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-4 ${confirmAction.type === "suspend" ? "bg-amber-100" : "bg-red-100"}`}>
+                            <svg className={`w-6 h-6 ${confirmAction.type === "suspend" ? "text-amber-600" : "text-red-600"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {confirmAction.type === "suspend" ? (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                ) : (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                )}
+                            </svg>
+                        </div>
+                        <h3 className={`text-lg font-bold text-gray-900 text-center mb-2 ${poppins.className}`}>
+                            {confirmAction.type === "suspend" ? "Suspend Campaign?" : "Delete Campaign?"}
+                        </h3>
+                        <p className={`text-sm text-gray-500 text-center mb-6 ${inter.className}`}>
+                            {confirmAction.type === "suspend"
+                                ? `This will take "${confirmAction.report.campaignTitle}" offline. The creator will be notified.`
+                                : `This will permanently delete "${confirmAction.report.campaignTitle}" and refund all approved supporters. This cannot be undone.`
+                            }
+                        </p>
+                        <div className="flex gap-3">
+                            <button onClick={() => setConfirmAction(null)} className={`flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all ${inter.className}`}>
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => confirmAction.type === "suspend" ? handleSuspend(confirmAction.report) : handleDeleteCampaign(confirmAction.report)}
+                                className={`flex-1 py-2.5 rounded-xl text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all ${inter.className} ${confirmAction.type === "suspend" ? "bg-gradient-to-r from-amber-500 to-amber-600" : "bg-gradient-to-r from-red-500 to-red-600"}`}
+                            >
+                                {confirmAction.type === "suspend" ? "Suspend Campaign" : "Delete Campaign"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -3,8 +3,11 @@ import { useState, useEffect } from "react";
 import HeroSlider from "@/components/HeroSlider";
 import PlatformStats from "@/components/PlatformStats";
 import HowItWorks from "@/components/HowItWorks";
+import Categories from "@/components/Categories";
+import Testimonials from "@/components/Testimonials";
 import TopCampaigns from "@/components/TopCampaigns";
 import Newsletter from "@/components/Newsletter";
+import FadeIn from "@/components/FadeIn";
 
 export default function Home() {
     const [campaigns, setCampaigns] = useState([]);
@@ -20,10 +23,12 @@ export default function Home() {
     return (
         <>
             <HeroSlider />
-            <PlatformStats stats={stats} />
-            <HowItWorks />
-            <TopCampaigns campaigns={campaigns} />
-            <Newsletter />
+            <FadeIn><PlatformStats stats={stats} /></FadeIn>
+            <FadeIn delay={0.1}><Categories /></FadeIn>
+            <FadeIn delay={0.15}><HowItWorks /></FadeIn>
+            <FadeIn delay={0.2}><TopCampaigns campaigns={campaigns} /></FadeIn>
+            <FadeIn delay={0.25}><Testimonials /></FadeIn>
+            <FadeIn delay={0.3}><Newsletter /></FadeIn>
         </>
     );
 }
