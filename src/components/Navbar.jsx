@@ -72,13 +72,6 @@ const Navbar = () => {
                                     Dashboard
                                 </Link>
 
-                                <Link
-                                    href="/register"
-                                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${inter.className} bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5`}
-                                >
-                                    Join as Developer
-                                </Link>
-
                                 <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100/60 rounded-full shadow-sm">
                                     <svg className="w-3.5 h-3.5 text-[#4F46E5]" viewBox="0 0 24 24" fill="currentColor">
                                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z" />
@@ -128,12 +121,6 @@ const Navbar = () => {
                                 >
                                     Register
                                 </Link>
-                                <Link
-                                    href="/register"
-                                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${inter.className} bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5`}
-                                >
-                                    Join as Developer
-                                </Link>
                             </>
                         )}
                     </div>
@@ -173,9 +160,6 @@ const Navbar = () => {
                                 <Link href={dashboardHref} onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${inter.className} ${isActive(dashboardHref) ? "text-[#4F46E5] bg-indigo-50" : "text-gray-700 hover:text-[#4F46E5] hover:bg-indigo-50/60"}`}>
                                     Dashboard
                                 </Link>
-                                <Link href="/register" onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-semibold text-center text-white bg-gradient-to-r from-emerald-500 to-emerald-600 ${inter.className}`}>
-                                    Join as Developer
-                                </Link>
                                 <div className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 ${inter.className}`}>
                                     <span>Available Credits</span>
                                     <span className="font-bold text-[#4F46E5]">{credits}</span>
@@ -198,9 +182,6 @@ const Navbar = () => {
                                 </Link>
                                 <Link href="/register" onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-semibold transition-all text-white bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-center ${inter.className}`}>
                                     Register
-                                </Link>
-                                <Link href="/register" onClick={() => setOpen(false)} className={`block px-4 py-2.5 rounded-xl text-sm font-semibold text-center text-white bg-gradient-to-r from-emerald-500 to-emerald-600 ${inter.className}`}>
-                                    Join as Developer
                                 </Link>
                             </>
                         )}
